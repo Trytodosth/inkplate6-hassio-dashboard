@@ -27,7 +27,7 @@ Distributed as-is; no warranty is given.
 // Static Json from ArduinoJson library
 StaticJsonDocument<32000> doc;
 
-void Network::begin(char *city)
+void Network::begin()
 {
     // Initiating wifi, like in BasicHttpClient example
     WiFi.mode(WIFI_STA);
@@ -58,7 +58,8 @@ void Network::begin(char *city)
 }
 
 
-bool Network::getData(char *currentTime, char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *nextSunrise, char *nextSunset,
+bool Network::getData(char *currentTime, char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain, char *nextSunrise, char *nextSunset,
+                      char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon, 
                       char *sensor1_temp, char *sensor1_press, char *sensor1_hum,
                       char *sensor2_temp, char *sensor2_press, char *sensor2_hum,
                       char *sensor3_temp, char *sensor3_press, char *sensor3_hum,
@@ -119,7 +120,8 @@ bool Network::getData(char *currentTime, char *currentTemp, char *currentWind, c
     getState("sensor.time_formatted", currentTime);
     getState("sensor.nextsunrise", nextSunrise);
     getState("sensor.nextsunset", nextSunset);
-    getWeatherHome(currentTemp, currentWind, currentWeather, currentWeatherIcon);
+    getWeatherHome(currentTemp, currentWind, currentWeather, currentWeatherIcon, expectedRain,
+                    today_temp_max, today_temp_min, today_icon, tomorr_temp_max, tomorr_temp_min, tomorr_icon);
 
     // Forecasts
     getWeatherForecast("weather.villeurbanne", 0, loc1_temp_max, loc1_temp_min, loc1_icon);
@@ -260,7 +262,8 @@ void Network::getSensorData(char entityName[], char *friendlyName, char *value, 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Network::getWeatherHome(char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon)
+void Network::getWeatherHome(char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain, 
+                              char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon)
 {
     // Http object used to make get request
     HTTPClient http;
@@ -292,11 +295,22 @@ void Network::getWeatherHome(char *currentTemp, char *currentWind, char *current
         }
         else
         {
-            // Extracting Info from JSON
+            //Current conditions
             strcpy(currentWeather, doc["state"].as<char *>());
             dtostrf(doc["attributes"]["temperature"].as<double>(), 4, 1, currentTemp);
             dtostrf(doc["attributes"]["wind_speed"].as<double>(), 4, 1, currentWind);
+            dtostrf(doc["attributes"]["forecast"][0]["precipitation"].as<double>(), 4, 1, expectedRain);
             iconAbbr(currentWeatherIcon, doc["state"].as<char *>());
+            
+            // Forecast today
+            dtostrf(doc["attributes"]["forecast"][0]["temperature"].as<double>(), 4, 1, today_temp_max);
+            dtostrf(doc["attributes"]["forecast"][0]["templow"].as<double>(), 4, 1, today_temp_min);
+            iconAbbr(today_icon, doc["attributes"]["forecast"][0]["condition"].as<char *>());
+            
+            // Forecast tomorrow
+            dtostrf(doc["attributes"]["forecast"][1]["temperature"].as<double>(), 4, 1, tomorr_temp_max);
+            dtostrf(doc["attributes"]["forecast"][1]["templow"].as<double>(), 4, 1, tomorr_temp_min);
+            iconAbbr(tomorr_icon, doc["attributes"]["forecast"][1]["condition"].as<char *>());
         }
     }
     else if (httpCode == 401)

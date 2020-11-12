@@ -23,16 +23,12 @@ Distributed as-is; no warranty is given.
 
 #include <WiFiClientSecure.h>
 
-// To get timeZone from main file
-extern int timeZone;
 
-// wifi ssid and password
+// WiFi SSID and Password
 extern char *ssid;
 extern char *pass;
 
-extern char *lon;
-extern char *lat;
-
+// Home Assistant Information
 extern char *apiKey;
 extern char *HAtoken;
 extern char *HAserverAPI;
@@ -48,15 +44,17 @@ class Network
 {
   public:
     // Functions we can access in main file
-    void begin(char *city);
-    bool getData(char *currentTime, char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *nextSunrise, char *nextSunset,
+    void begin();
+    bool getData(char *currentTime, char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain, char *nextSunrise, char *nextSunset,
+                      char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon, 
                       char *sensor1_temp, char *sensor1_press, char *sensor1_hum,
                       char *sensor2_temp, char *sensor2_press, char *sensor2_hum,
                       char *sensor3_temp, char *sensor3_press, char *sensor3_hum,
                       char *loc1_temp_max, char *loc1_temp_min, char *loc1_icon, char *loc2_temp_max, char *loc2_temp_min, char *loc2_icon, char *loc3_temp_max, char *loc3_temp_min, char *loc3_icon);
     void getState(char entityName[], char *output);
     void getSensorData(char entityName[], char *sensor1_name, char *value, char *unit);
-    void getWeatherHome(char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon);
+    void getWeatherHome(char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain, 
+                        char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon);
     void getWeatherForecast(char entityName[], int indForecast, char *forecastTemperatureMax, char *forecastTemperatureMin, char *forecastIcon);
     void iconAbbr(char *iconOutput, const char *weatherState);
 

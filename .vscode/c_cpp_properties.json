@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "C:\\Users\\Maxime\\AppData\\Local\\Arduino15\\packages\\Croduino_Boards\\tools\\**",
+                "C:\\Users\\Maxime\\AppData\\Local\\Arduino15\\packages\\Croduino_Boards\\hardware\\esp32\\1.0.0\\**",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.18362.0",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "msvc-x64",
+            "forcedInclude": []
+        }
+    ],
+    "version": 4
+}

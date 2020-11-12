@@ -17,7 +17,7 @@ from PIL.Image import new
 # Parameters
 output_3bit = True
 invert_colors = True
-resize_w = 100 # Desired Width. Set <0 to desactivate the resizing
+resize_w = 50 # Desired Width. Set <0 to desactivate the resizing
 channel_to_consider = 'G'
 consider_alpha = True
 
