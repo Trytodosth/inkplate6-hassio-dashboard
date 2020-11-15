@@ -1,5 +1,6 @@
 {
     "port": "COM3",
     "board": "Croduino_Boards:esp32:Inkplate6",
-    "configuration": "PSRAM=enabled,PartitionScheme=huge_app,CPUFreq=240,UploadSpeed=115200,DebugLevel=info"
+    "configuration": "PSRAM=enabled,PartitionScheme=huge_app,CPUFreq=240,UploadSpeed=115200,DebugLevel=info",
+    "sketch": "Test_picture_1bit.ino"
 }

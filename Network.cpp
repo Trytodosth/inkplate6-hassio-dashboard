@@ -16,7 +16,9 @@ Distributed as-is; no warranty is given.
 
 // Network.cpp contains various functions and classes that enable Weather station
 // They have been declared in seperate file to increase readability
+
 #include "Network.h"
+#include "Secrets.h"  // WIFI credentials and Hassio parameters
 
 #include <HTTPClient.h>
 #include <WiFi.h>
@@ -31,7 +33,7 @@ void Network::begin()
 {
     // Initiating wifi, like in BasicHttpClient example
     WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, pass);
+    WiFi.begin(WiFi_ssid, WiFi_pass);
 
     int cnt = 0;
     Serial.print(F("Waiting for WiFi to connect..."));

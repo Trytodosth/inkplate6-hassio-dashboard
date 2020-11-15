@@ -14,9 +14,9 @@ If you have any questions about licensing, please contact techsupport@e-radionic
 Distributed as-is; no warranty is given.
 */
 
-#include "Arduino.h"
+#include <Arduino.h>
 
-#include "Inkplate.h"
+#include <Inkplate.h>
 #include <WiFi.h>
 
 #include <HTTPClient.h>
@@ -25,8 +25,8 @@ Distributed as-is; no warranty is given.
 
 
 // WiFi SSID and Password
-extern char *ssid;
-extern char *pass;
+extern char *WiFi_ssid;
+extern char *WiFi_pass;
 
 // Home Assistant Information
 extern char *apiKey;

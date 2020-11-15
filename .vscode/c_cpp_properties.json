@@ -3,6 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
+                "C:\\Users\\Maxime\\Documents\\Arduino\\libraries\\Inkplate-6-Arduino-library-master\\src",
+                "C:\\Users\\Maxime\\Documents\\Arduino\\libraries\\ArduinoJson\\src",
                 "C:\\Users\\Maxime\\AppData\\Local\\Arduino15\\packages\\Croduino_Boards\\tools\\**",
                 "C:\\Users\\Maxime\\AppData\\Local\\Arduino15\\packages\\Croduino_Boards\\hardware\\esp32\\1.0.0\\**",
                 "${workspaceFolder}/**"

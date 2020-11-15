@@ -1,0 +1,5 @@
+#include "icon_raindrop_50px.h"
+#include "icon_sunrise_50px.h"
+#include "icon_sunset_50px.h"
+#include "icon_wind_50px.h"
+

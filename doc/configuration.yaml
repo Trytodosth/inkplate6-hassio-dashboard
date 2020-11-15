@@ -1,0 +1,58 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+homeassistant:
+  auth_providers:
+    - type: trusted_networks
+      trusted_networks:
+        - 192.168.0.0/24
+        - 192.168.1.0/24
+        - fd00::/8
+
+# API activation
+api:
+
+http:
+
+# Depending on your needs
+mqtt:
+  broker: mqtt
+  
+
+sensor:
+  # Minimal configuration of the standard time and date sensor
+  - platform: time_date
+    display_options:
+      - 'date_time_iso'
+  - platform: template
+    sensors:
+      # The time and date like you prefer it
+      time_formatted:
+        friendly_name: "Date and time"
+        value_template: >
+          {{ as_timestamp(states('sensor.date_time_iso')) | timestamp_custom('%d/%m/%Y, %-Hh%M', False) }}
+        icon_template: mdi:calendar-clock
+      # Custom sensors to format Sunrise and have it in local time
+      nextsunrise:
+        friendly_name: 'Lever'
+        value_template: >
+          {{ as_timestamp(state_attr('sun.sun', 'next_rising')) | timestamp_custom('%-Hh%M', True) }}
+        icon_template: mdi:weather-sunset-up
+      # Custom sensors to format Sunset and have it in local time
+      nextsunset:
+        friendly_name: 'Coucher'
+        value_template: >
+          {{ as_timestamp(state_attr('sun.sun', 'next_setting')) | timestamp_custom('%-Hh%M', True) }}
+        icon_template: mdi:weather-sunset-down
+        
+
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
