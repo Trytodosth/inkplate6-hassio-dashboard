@@ -58,8 +58,10 @@ for file in os.listdir(input_dir):
         w, h = raw_im.size
         logging.info('size: {:d}x{:d} px'.format(w, h))
         
-        #new_im = raw_im.convert('LA') # Grayscale with A channel
-        new_im = raw_im.getchannel(channel_to_consider)
+        if channel_to_consider == 'L':
+            new_im = raw_im.convert('L') # Grayscale with A channel
+        else:
+            new_im = raw_im.getchannel(channel_to_consider)
         if consider_alpha:
             new_im_A = raw_im.getchannel('A') # for Alpha consideration
         else:

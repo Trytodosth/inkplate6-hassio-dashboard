@@ -9,7 +9,10 @@ This work was hugely based on the e-Radionica tutorial: [Real time Weather stati
 In its current status, the program is meant as a Home Assistant Hub, mostly used for weather and temperature monitoring.
 It displays Temperature/Pressure/Humidity of 3 sensors, local actual weather and forecast, and forecast for remote places.
 
-![Example of result](doc/images/Example.jpg)
+__Poor lighting nearby the computer and protection film on the screen  explain the apparent poor quality. Display is very nice in reality!__
+![Example of result](doc/images/Example2.jpg)
+<img src="doc/images/Loading_screen.jpg" alt="Loading screen" width="300"/>
+<img src="doc/images/Low_battery_screen.jpg" alt="Low battery screen" width="300"/>
 
 ## How it works
 The Inkplate fetches information from the Home Assistant (HA) server through API calls (HTTP GET requests). It can get any information from the HA server: sensors, states, weather, etc. Everything is within a Json object, easy to extract!
@@ -46,7 +49,7 @@ To have weather forecasts in different places, you should set the integrations.
 ### Configuration.yaml & API
 Once HA is configured, we should setup the API.
 * Update the ```configuration.yaml``` file to allow the API. An example is given [here](doc/configuration.yaml)
-* Create a [long-lived Token](https://developers.home-assistant.io/docs/auth_api/#long-lived-access-token) to access the API. Use the Web UI to do it: ```Web UI > User > Long-lived access tokens```
+* Create a [long-lived access token](https://developers.home-assistant.io/docs/auth_api/#long-lived-access-token) to access the API. Use the Web UI to do it: ```Web UI > User > Long-lived access tokens```
 
 ## Inkplate
 Please run an example to make sure compilation, transfer and execution are OK.
@@ -54,10 +57,14 @@ Please run an example to make sure compilation, transfer and execution are OK.
 On the Inkplate 6, you need to change the Arduino file with your configurations. Obviously, it is unlikely you'll keep the same as me, but adapting should be quite easy.
 
 Minimal things to change:
-* WiFi credentials: ```ssid``` and ```password```
-* Home Assistant API adress and long-lived Token
-* Sensor names
-* Cities names
+* Edit the ```Secrets_example.h``` and save it to ```Secrets.h```. This file contains sensitive information that will not be visible to others when you share your cide!
+  * WiFi credentials: ```ssid``` and ```password```
+  * Home Assistant API adress and long-lived access token
+
+Other changes:
+* Sensor and Cities names are defined in the ```Fields_definitions.h```.
+* Although many things are also hard coded in ```Network.cpp``` and should be edited to redirect to your sensors / states
+* The UI arrangment is defined in the main ```.ino```, along with the selective refresh rates.
 
 Note that I used weather modules from *Norwegian Meteorological Institute* and *Météo-France*, which both use the same standard [Weather entity](https://developers.home-assistant.io/docs/core/entity/weather/). If you use another provider, you will have to adapt it. I prefered to use HA but sending a direct call to an API like [OpenWeatherMap](https://openweathermap.org/api) is perfectly possible. Limit of number of calls should be considered!
 
@@ -72,10 +79,12 @@ The existing python file from the Inkplate librairy example was adapted to handl
 * Setup an ```Python3``` environment with ```Pillow``` librairy
 * Copy the image to convert into the ```icons_to_binary``` folder
 * Edit the Python script to match your parameters
-  * ```output_3bit```: True to export as 3bit, False to have 1bit images
+  * ```TESTING```: True to export only the first picture and have it displayed.
+  * ```output_3bit```: True to export as 3bit, False to have 1bit images.
+  * ```threshold_1bit```: Pixel value [0..255] defining the limit for 1bit cases (ignored if 3bit).
   * ```resize_w```: Target width (preserves ratio). Negative number to desactivate.
-  * ```invert_colors```: Will invert the colors in the output
-  * ```channel_to_consider```: Channel to consider from the picture. ```R``` to consider the R from RGB values. ```L``` will convert the picture into grayscale and use it. ```A``` is also possible to use only the alpha channel (if present)
+  * ```invert_colors```: Will invert the colors in the output.
+  * ```channel_to_consider```: Channel to consider from the picture. ```R``` to consider the R from RGB values. ```L``` will convert the picture into grayscale and use it. ```A``` is also possible to use only the alpha channel (if present). Note the input image is always converted to RGBA to avoid channel issues.
   * ```consider_alpha```: For many PNGs, the *transparent* areas do not have a RGB of (0, 0, 0). Therefore, when set to True, the ```channel_to_consider``` is multiplied by the alpha channel to also remove these parts. The alpha channel is inversed before multiplication (```out = channel_to_consider * (255 - alpha_channel```)
 
 
