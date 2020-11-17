@@ -19,6 +19,9 @@ void drawRaindropIcon(int pos_x = 50, int pos_y = 372);
 void drawSunriseIcon(int pos_x = 280, int pos_y = 330);
 void drawSunsetIcon(int pos_x = 280, int pos_y = 380);
 
+// Battery icon
+void drawBatteryIcon(int charge, bool isCharging, int pos_x = 550, int pos_y = 5);
+
 // Print helper
 
 void printCelsiusCircle(int fontsize_px, int color = BLACK);

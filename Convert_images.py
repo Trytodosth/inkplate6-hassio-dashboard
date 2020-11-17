@@ -22,7 +22,7 @@ threshold_1bit = 128 # Only required if 1bit mode
 invert_colors = False # based on RGB, white in the picture results into black on the plate.
 resize_w = -1 # Desired Width. Set <0 to desactivate the resizing
 channel_to_consider = 'G' # R: Red; G: Green; B: Blue; L: Grayscale
-consider_alpha = True
+consider_alpha = False
 
 include_text = ''
 
@@ -52,7 +52,7 @@ for file in os.listdir(input_dir):
     count += 1
     logging.info('#{:d}: {}:'.format(count, file))
     try:
-        raw_im = Image.open(os.path.join(input_dir, file))
+        raw_im = Image.open(os.path.join(input_dir, file)).convert('RGBA')
         logging.debug('Input mode:' + raw_im.mode)
         
         w, h = raw_im.size
@@ -60,13 +60,17 @@ for file in os.listdir(input_dir):
         
         #new_im = raw_im.convert('LA') # Grayscale with A channel
         new_im = raw_im.getchannel(channel_to_consider)
-        new_im_A = raw_im.getchannel('A') # for Alpha consideration
+        if consider_alpha:
+            new_im_A = raw_im.getchannel('A') # for Alpha consideration
+        else:
+            new_im_A = None
 
         # Resize if requested
         if resize_w > 0:
             h = round(resize_w/w*h)
             new_im = new_im.resize((resize_w, h), PIL.Image.LANCZOS)
-            new_im_A = new_im_A.resize((resize_w, h), PIL.Image.LANCZOS)
+            if consider_alpha:
+                new_im_A = new_im_A.resize((resize_w, h), PIL.Image.LANCZOS)
             w, h = new_im.size
             logging.info('> resized: {:d}x{:d} px'.format(w, h))
 
@@ -137,7 +141,7 @@ for file in os.listdir(input_dir):
             print('const uint8_t ' + function_name + '[] PROGMEM = {', file=f)
             print(binary_s, file=f)
 
-        include_text += '#include "{}.h"\n'.format(function_name)
+        include_text += '#include "{}.h"\n'.format(os.path.basename(output_dir) + '/' + function_name)
         logging.info('> exported to : {}'.format(os.path.join(os.path.basename(output_dir), function_name + '.h')))
 
         if TESTING:

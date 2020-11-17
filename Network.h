@@ -1,17 +1,17 @@
 /*
-Network.h
-Inkplate 6 Arduino library
-David Zovko, Borna Biro, Denis Vajak, Zvonimir Haramustek @ e-radionica.com
-September 24, 2020
-https://github.com/e-radionicacom/Inkplate-6-Arduino-library
+  Network.h
+  Inkplate 6 Arduino library
+  David Zovko, Borna Biro, Denis Vajak, Zvonimir Haramustek @ e-radionica.com
+  September 24, 2020
+  https://github.com/e-radionicacom/Inkplate-6-Arduino-library
 
-For support, please reach over forums: forum.e-radionica.com/en
-For more info about the product, please check: www.inkplate.io
+  For support, please reach over forums: forum.e-radionica.com/en
+  For more info about the product, please check: www.inkplate.io
 
-This code is released under the GNU Lesser General Public License v3.0: https://www.gnu.org/licenses/lgpl-3.0.en.html
-Please review the LICENSE file included with this example.
-If you have any questions about licensing, please contact techsupport@e-radionica.com
-Distributed as-is; no warranty is given.
+  This code is released under the GNU Lesser General Public License v3.0: https://www.gnu.org/licenses/lgpl-3.0.en.html
+  Please review the LICENSE file included with this example.
+  If you have any questions about licensing, please contact techsupport@e-radionica.com
+  Distributed as-is; no warranty is given.
 */
 
 #include <Arduino.h>
@@ -35,6 +35,8 @@ extern char *HAserverAPI;
 
 extern Inkplate display;
 
+extern int drawLevel;
+
 #ifndef NETWORK_H
 #define NETWORK_H
 
@@ -45,23 +47,27 @@ class Network
   public:
     // Functions we can access in main file
     void begin();
-    bool getData(char *currentTime, char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain, char *nextSunrise, char *nextSunset,
-                      char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon, 
-                      char *sensor1_temp, char *sensor1_press, char *sensor1_hum,
-                      char *sensor2_temp, char *sensor2_press, char *sensor2_hum,
-                      char *sensor3_temp, char *sensor3_press, char *sensor3_hum,
-                      char *loc1_temp_max, char *loc1_temp_min, char *loc1_icon, char *loc2_temp_max, char *loc2_temp_min, char *loc2_icon, char *loc3_temp_max, char *loc3_temp_min, char *loc3_icon);
-    void getState(char entityName[], char *output);
-    void getSensorData(char entityName[], char *sensor1_name, char *value, char *unit);
-    void getWeatherHome(char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain, 
-                        char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon);
-    void getWeatherForecast(char entityName[], int indForecast, char *forecastTemperatureMax, char *forecastTemperatureMin, char *forecastIcon);
+    void CheckWiFi(int nbMaxAttempts = 7);
+    bool getLocalWeatherData(char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain,
+                             char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon);
+    bool getSensorsData(char *sensor1_temp, char *sensor1_press, char *sensor1_hum,
+                        char *sensor2_temp, char *sensor2_press, char *sensor2_hum,
+                        char *sensor3_temp, char *sensor3_press, char *sensor3_hum);
+    bool getSunData(char *nextSunrise, char *nextSunset);
+    bool getOtherCitiesData(char *loc1_temp_max, char *loc1_temp_min, char *loc1_icon, char *loc2_temp_max, char *loc2_temp_min, char *loc2_icon, char *loc3_temp_max, char *loc3_temp_min, char *loc3_icon);
+    bool getTimestamp(char *currentTime);
     void iconAbbr(char *iconOutput, const char *weatherState);
 
     // Used for storing retrieved data timestamp
     time_t dataEpoch = 0;
 
   private:
+    bool getJSON(char entityName[]);
+    bool getState(char entityName[], char *output);
+    bool getSensorData(char entityName[], char *sensor1_name, char *value, char *unit);
+    bool getWeatherHome(char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain,
+                        char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon);
+    bool getWeatherForecast(char entityName[], int indForecast, char *forecastTemperatureMax, char *forecastTemperatureMin, char *forecastIcon);
     // Functions called from within our class
     void setTime();
 };

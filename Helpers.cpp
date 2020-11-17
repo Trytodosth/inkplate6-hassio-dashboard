@@ -1,4 +1,4 @@
-/* 
+/*
     This file contains simple function to plot the weather icons.
     Grouped here for project readability.
     If changing from 1bit to 3bit, it can be done from here for all icons (.h files must be updated).
@@ -31,24 +31,24 @@ const uint8_t *logos_200px[15] = {
 
 void drawWeatherIcon_small(int pos_x, int pos_y, char *icon_abbr)
 {
-    int i = 0;
-    while (strcmp(abbrs[i], icon_abbr) != 0 | i == 14)
-    {
-        i++;
-    }
-    //display.drawBitmap3Bit(pos_x, pos_y, logos_100px[i], 100, 100);
-    display.drawBitmap(pos_x, pos_y, logos_100px[i], 100, 100, BLACK, WHITE);
+  int i = 0;
+  while (strcmp(abbrs[i], icon_abbr) != 0 | i == 14)
+  {
+    i++;
+  }
+  //display.drawBitmap3Bit(pos_x, pos_y, logos_100px[i], 100, 100);
+  display.drawBitmap(pos_x, pos_y, logos_100px[i], 100, 100, BLACK, WHITE);
 };
 
 void drawWeatherIcon_medium(int pos_x, int pos_y, char *icon_abbr)
 {
-    int i = 0;
-    while (strcmp(abbrs[i], icon_abbr) != 0 | i == 14)
-    {
-        i++;
-    }
-    //display.drawBitmap3Bit(pos_x, pos_y, logos_200px[i], 200, 200);
-    display.drawBitmap(pos_x, pos_y, logos_200px[i], 200, 200, BLACK, WHITE);
+  int i = 0;
+  while (strcmp(abbrs[i], icon_abbr) != 0 | i == 14)
+  {
+    i++;
+  }
+  //display.drawBitmap3Bit(pos_x, pos_y, logos_200px[i], 200, 200);
+  display.drawBitmap(pos_x, pos_y, logos_200px[i], 200, 200, BLACK, WHITE);
 };
 
 
@@ -56,26 +56,64 @@ void drawWeatherIcon_medium(int pos_x, int pos_y, char *icon_abbr)
 
 void drawWindIcon(int pos_x, int pos_y)
 {
-    //display.drawBitmap3Bit(pos_x, pos_y, icon_wind_50px, 50, 50);
-    display.drawBitmap(pos_x, pos_y, icon_wind_50px, 50, 50, BLACK, WHITE);
+  //display.drawBitmap3Bit(pos_x, pos_y, icon_wind_50px, 50, 50);
+  display.drawBitmap(pos_x, pos_y, icon_wind_50px, 50, 50, BLACK, WHITE);
 }
 
 void drawRaindropIcon(int pos_x, int pos_y)
 {
-    //display.drawBitmap3Bit(pos_x, pos_y, icon_raindrop_50px, 50, 50);
-    display.drawBitmap(pos_x, pos_y, icon_raindrop_50px, 50, 50, BLACK, WHITE);
+  //display.drawBitmap3Bit(pos_x, pos_y, icon_raindrop_50px, 50, 50);
+  display.drawBitmap(pos_x, pos_y, icon_raindrop_50px, 50, 50, BLACK, WHITE);
 }
 
 void drawSunriseIcon(int pos_x, int pos_y)
 {
-    //display.drawBitmap3Bit(pos_x, pos_y, icon_sunrise_50px, 50, 50);
-    display.drawBitmap(pos_x, pos_y, icon_sunrise_50px, 50, 41, BLACK, WHITE);
+  //display.drawBitmap3Bit(pos_x, pos_y, icon_sunrise_50px, 50, 50);
+  display.drawBitmap(pos_x, pos_y, icon_sunrise_50px, 50, 41, BLACK, WHITE);
 }
 
 void drawSunsetIcon(int pos_x, int pos_y)
 {
-    //display.drawBitmap3Bit(pos_x, pos_y, icon_sunset_50px, 50, 50);
-    display.drawBitmap(pos_x, pos_y, icon_sunset_50px, 50, 41, BLACK, WHITE);
+  //display.drawBitmap3Bit(pos_x, pos_y, icon_sunset_50px, 50, 50);
+  display.drawBitmap(pos_x, pos_y, icon_sunset_50px, 50, 41, BLACK, WHITE);
+}
+
+
+
+// ---- Battery icon ----
+
+void drawBatteryIcon(int charge, bool isCharging, int pos_x, int pos_y) {
+  Serial.print(F("Plotting battery icon: "));
+  Serial.print(charge);
+  Serial.print(F(" ; "));
+  Serial.println(isCharging);
+  if (isCharging == true) {
+    if (charge >= 95)
+      display.drawBitmap(pos_x, pos_y, icon_battery_100c, 35, 20, BLACK, WHITE);
+    if (charge < 95 && charge >= 80)
+      display.drawBitmap(pos_x, pos_y, icon_battery_80c, 35, 20, BLACK, WHITE);
+    if (charge < 80 && charge >= 60)
+      display.drawBitmap(pos_x, pos_y, icon_battery_60c, 35, 20, BLACK, WHITE);
+    if (charge < 60 && charge >= 40)
+      display.drawBitmap(pos_x, pos_y, icon_battery_40c, 35, 20, BLACK, WHITE);
+    if (charge < 40 && charge >= 20)
+      display.drawBitmap(pos_x, pos_y, icon_battery_20c, 35, 20, BLACK, WHITE);
+    if (charge < 20)
+      display.drawBitmap(pos_x, pos_y, icon_battery_00c, 35, 20, BLACK, WHITE);
+  } else {
+    if (charge >= 95)
+      display.drawBitmap(pos_x, pos_y, icon_battery_100, 35, 20, BLACK, WHITE);
+    if (charge < 95 && charge >= 80)
+      display.drawBitmap(pos_x, pos_y, icon_battery_80, 35, 20, BLACK, WHITE);
+    if (charge < 80 && charge >= 60)
+      display.drawBitmap(pos_x, pos_y, icon_battery_60, 35, 20, BLACK, WHITE);
+    if (charge < 60 && charge >= 40)
+      display.drawBitmap(pos_x, pos_y, icon_battery_40, 35, 20, BLACK, WHITE);
+    if (charge < 40 && charge >= 20)
+      display.drawBitmap(pos_x, pos_y, icon_battery_20, 35, 20, BLACK, WHITE);
+    if (charge < 20)
+      display.drawBitmap(pos_x, pos_y, icon_battery_00, 35, 20, BLACK, WHITE);
+  }
 }
 
 // ---- Print assist ----
@@ -112,35 +150,34 @@ void printText(char *text, int pos_x, int pos_y, const GFXfont *f)
 void printTextColor(char *text, int pos_x, int pos_y, const GFXfont *f, int color)
 {
   // Prints text, changing the color
-  display.setTextColor(color, 7-color);
+  display.setTextColor(color, 7 - color);
   printText(text, pos_x, pos_y, f);
 }
 
 void eraseText(int pos_x, int pos_y, int w, int h, int color)
 {
   // Fills an area with color to erase the text
-  display.fillRect(pos_x, pos_y-h+2, w, h, color); //+2 to get commas, etc.
+  display.fillRect(pos_x, pos_y - h + 2, w, h, color); //+2 to get commas, etc.
 }
 
 void eraseTextAtCursor(int w, int h, int color)
 {
   // Fills an area with color to erase the text, using cursor position
-  eraseText(display.getCursorX(), display.getCursorY()+2, w, h, color); //+2 to get commas, etc.
+  eraseText(display.getCursorX(), display.getCursorY() + 2, w, h, color); //+2 to get commas, etc.
 }
 
 void eraseAndPrint(char *text, int pos_x, int pos_y, const GFXfont *f, int textColor, int widthErase, int heightErase)
 {
   // Erase and then print text
-  if (widthErase == 0) widthErase = (int) (strlen(text) * 36 * 1.5);
+  if (widthErase == 0) widthErase = (int) (strlen(text) * 36 * 0.6);
   if (heightErase == 0) heightErase = 36;
+  //Serial.println(text);
+  //Serial.println(widthErase);
 
   if (textColor == BLACK)
     eraseText(pos_x, pos_y, widthErase, heightErase, WHITE);
   else
     eraseText(pos_x, pos_y, widthErase, heightErase, BLACK);
-    
+
   printText(text, pos_x, pos_y, f);
 }
-
-
-  

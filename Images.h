@@ -35,6 +35,20 @@
 #include "Binary_images/icon_windy_200px.h"
 #include "Binary_images/icon_exceptional_200px.h"
 
+// Battery indicators
+#include "Binary_images/icon_battery_00.h"
+#include "Binary_images/icon_battery_00c.h"
+#include "Binary_images/icon_battery_100.h"
+#include "Binary_images/icon_battery_100c.h"
+#include "Binary_images/icon_battery_20.h"
+#include "Binary_images/icon_battery_20c.h"
+#include "Binary_images/icon_battery_40.h"
+#include "Binary_images/icon_battery_40c.h"
+#include "Binary_images/icon_battery_60.h"
+#include "Binary_images/icon_battery_60c.h"
+#include "Binary_images/icon_battery_80.h"
+#include "Binary_images/icon_battery_80c.h"
+
 // Images for current weather (50x??)
 #include "Binary_images/icon_wind_50px.h"
 #include "Binary_images/icon_sunrise_50px.h"
