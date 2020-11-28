@@ -9,20 +9,21 @@ This work was hugely based on the e-Radionica tutorial: [Real time Weather stati
 In its current status, the program is meant as a Home Assistant Hub, mostly used for weather and temperature monitoring.
 It displays Temperature/Pressure/Humidity of 3 sensors, local actual weather and forecast, and forecast for remote places.
 
-__Poor lighting nearby the computer and protection film on the screen  explain the apparent poor quality. Display is very nice in reality!__
+__Protection film on the screen explains some artefacts. Display is very nice! Small pictures in poor lighting conditions__
 ![Example of result](doc/images/Example2.jpg)
 <img src="doc/images/Loading_screen.jpg" alt="Loading screen" width="300"/>
 <img src="doc/images/Low_battery_screen.jpg" alt="Low battery screen" width="300"/>
 
 ## How it works
-The Inkplate fetches information from the Home Assistant (HA) server through API calls (HTTP GET requests). It can get any information from the HA server: sensors, states, weather, etc. Everything is within a Json object, easy to extract!
+The Inkplate fetches information from the Home Assistant (HA / Hassio) server through **API calls** (HTTP GET requests). It can get any information from the HA server: sensors, states, weather, etc. Everything is within a Json object, easy to extract!
 
-The information is rendered on the plate using simple functions.
+The information is rendered on the plate using **simple functions**.
 Icons are png pictures converted to 1bit or 3bits PROGMEM variables. No SD card needed.
 
 The plate is sleeping between calls, which should save battery. A time-stamp is added to check if it is still updating.
+Updates are **differentiated**: sensors updated regularly, weather forecasts not!
 
-The project is for now in 3bit mode, but switching back to 1bit is an option. It mostly mean finding the right icons (sometimes impossible to read with BW display). It also removes light background options as used in the example for the sensors data. 1bit mode allow to have partial updates.
+The project is for now in **1bit mode** is an option. With the right icons, BW is not an issue and it unlock the discrete partial update: no more flashing! With 3bits, 8 shades from black to white are possible, allowing background and other features, at the cost of the partial update capability.
 
 ## Pre-requesites
 This project requires the following elements:
@@ -31,6 +32,12 @@ This project requires the following elements:
 * All the [librairies](https://github.com/e-radionicacom/Inkplate-6-Arduino-library#setting-up-inkplate-6-in-arduino-ide) to have the Inkplate up and running
 * An [Home Assistant](https://www.home-assistant.io/) server, with specific settings defined below
 * Something to check your API is strongly recommended. I personally used [Postman](https://www.postman.com/)
+
+## Partial updates
+The guys from e-radionica had the partial updates in mind when they developed the Inkplate. Not only the global refresh is quite fast, but th epartial update is very fast and discrete!
+
+It works only in 1bit mode, here is a demo (custom controllers addition in progress):
+![Demo of partial update](doc/images/partialUpdate.gif)
 
 
 # Configuration
