@@ -18,11 +18,12 @@
 
 #include <Inkplate.h>
 #include <WiFi.h>
-
 #include <HTTPClient.h>
-
 #include <WiFiClientSecure.h>
 
+
+extern const GFXfont Roboto_Light_36;
+extern const GFXfont Roboto_Light_48;
 
 // WiFi SSID and Password
 extern char *WiFi_ssid;
@@ -40,6 +41,7 @@ extern int drawLevel;
 #ifndef NETWORK_H
 #define NETWORK_H
 
+
 // All functions defined in Network.cpp
 
 class Network
@@ -47,7 +49,7 @@ class Network
   public:
     // Functions we can access in main file
     void begin();
-    void CheckWiFi(int nbMaxAttempts = 7);
+    void CheckWiFi(int nbMaxAttempts = 10);
     bool getLocalWeatherData(char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain,
                              char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon);
     bool getSensorsData(char *sensor1_temp, char *sensor1_press, char *sensor1_hum,
@@ -70,6 +72,7 @@ class Network
     bool getWeatherForecast(char entityName[], int indForecast, char *forecastTemperatureMax, char *forecastTemperatureMin, char *forecastIcon);
     // Functions called from within our class
     void setTime();
+    void print_no_wifi();
 };
 
 #endif

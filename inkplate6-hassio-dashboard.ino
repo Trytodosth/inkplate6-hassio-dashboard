@@ -41,7 +41,7 @@
 
 // Additional images
 #include "Binary_images/Low_battery.h"
-#include "Binary_images/Hassio_logo_200px.h"
+#include "Binary_images/Home_screen2.h"
 
 
 // Class instances
@@ -63,6 +63,17 @@ const long SUN_REFRESH_MOD = 1;
 long refreshes = 0;         // counter
 const int fullRefresh = 10; // modulo
 int drawLevel = 1; // Values only
+
+
+// ------- BATTERY --------
+float voltage;
+float voltage_percent;
+
+// Ajustment depending on ESP32 ADC + battery used
+float voltage_min = 3.0;
+float voltage_max = 4.3;
+
+char voltage_string[10];
 
 
 // ------- DECLARATIONS AND DEFINITIONS --------
@@ -96,6 +107,7 @@ char currentWeatherIcon[20] = "exceptional";
 // Prototypes of functions defined below
 void drawCityName();
 void drawTime();
+void drawBattery();
 void drawWeather(int drawLevel = 1);
 void drawSensors(int drawLevel = 1);
 void drawCities(int drawLevel = 1);
@@ -115,18 +127,16 @@ void setup()
   display.setTextSize(1);
 
   // 1bit mode: display.drawBitmap(pos_x, pos_y, progmem_const, width, height, color = BLACK | WHITE, color_bg = WHITE | BLACK);
-  display.drawBitmap(50, 212, Hassio_logo_200px, 200, 176, BLACK);
+  display.drawBitmap(0, 0, Home_screen2, 800, 600, WHITE, BLACK);
   display.display();
-  delay(300);
+  delay(1000);
 
   // Text
-  printText((char *)F("Home Assistant Hub"), 270, 260, &Roboto_Light_48);
-  display.partialUpdate();
-  delay(500);
-  printText((char *)F("> Powered by an Inkplate 6"), 270, 310, &Roboto_Light_36);
-  display.partialUpdate();
-  delay(500);
-  printText((char *)F("> Created by Trytodosth"), 270, 360, &Roboto_Light_36);
+  display.setTextColor(WHITE);
+  display.setFont(&Roboto_Light_36);
+  display.setCursor(20, 580);
+  display.print(F("Recherche WiFi..."));
+  display.setTextColor(BLACK);
   display.partialUpdate();
 
 
@@ -174,7 +184,7 @@ void loop()
     drawCityName(); // On top of main icon
     drawBattery();
     drawTime(); // On top of everything else
-    
+
     if (!success) // Skipped if everyhting OK. Not selective, I know
     {
       Serial.println("Retrying fetching data!");
@@ -182,7 +192,7 @@ void loop()
     }
   }
   drawLevel = 2; // Values only. DrawLevel can be edited in Network to redraw all after displaying an error.
-  
+
   // Refresh full screen every fullRefresh times, defined above
   if (refreshes % fullRefresh == 0)
     display.display();
@@ -220,9 +230,23 @@ void drawTime()
 // Function for drawing current time
 void drawBattery()
 {
-  // Drawing current time
-  eraseAndPrint((char *)F("88%"), 500, 26, &Roboto_Light_24, BLACK, 120);
-  drawBatteryIcon(88, false);
+  //temperature = display.readTemperature(); // Read temperature from on-board temperature sensor
+  voltage = display.readBattery(); // Read battery voltage (NOTE: Doe to ESP32 ADC accuracy, you should calibrate the ADC!)
+
+  voltage_percent = min((float)100, max((float)0, 100 * (voltage - voltage_min) / (voltage_max - voltage_min)));
+
+  dtostrf(voltage_percent, 3, 0, voltage_string);
+  strcat (voltage_string, "% ");
+
+  //  // Current battery voltage
+  //  Serial.print(F("Battery level: "));
+  //  Serial.print(voltage_string);
+  //  Serial.print(F(" = "));
+  //  Serial.println(voltage_percent);
+
+  display.fillRect(597, 0, 100, 38, WHITE);
+  printText(voltage_string, 597, 34, &Roboto_Light_24);
+  drawBatteryIcon(voltage_percent, false, 560, 15);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -247,7 +271,7 @@ void drawWeather(int drawLevel)
   else if (drawLevel >= 1)
   {
     // Erase old values
-    display.fillRect(105, 320, 110, 100, WHITE); // Wind and rain
+    display.fillRect(105, 320, 160, 100, WHITE); // Wind and rain
     display.fillRect(370, 105, 75, 100, WHITE); // Forecast today
     display.fillRect(370, 105 + 125, 75, 100, WHITE); // Forecast tomorrow
 
@@ -255,12 +279,12 @@ void drawWeather(int drawLevel)
     drawWeatherIcon_medium(30, 30, currentWeatherIcon);
 
     // Temperature
-    eraseAndPrint(currentTemp, 40, 300, &Roboto_Light_72, BLACK);
+    eraseAndPrint(currentTemp, 40, 300, &Roboto_Light_72, BLACK, 180, 80);
     printCelsiusAtCursor(&Roboto_Light_36, 36);
 
     // Wind
     printText(currentWind, 105, 360, &Roboto_Light_36);
-    printTextAtCursor((char *)F("m/s"), &Roboto_Light_24);
+    printTextAtCursor((char *)F("km/h"), &Roboto_Light_24);
 
     // Rain
     printText(expectedRain, 105, 410, &Roboto_Light_36);
@@ -273,6 +297,7 @@ void drawWeather(int drawLevel)
     printCelsiusAtCursor(&Roboto_Light_24, 24);
     printText(today[1], 370, 70 + 70 + 35, &Roboto_Light_36);
     printCelsiusAtCursor(&Roboto_Light_24, 24);
+    printText((char *)F("Ajourd."), 370 - 20, 70 + 35, &Roboto_Light_36);
 
     // Forecast Tomorrow
     drawWeatherIcon_small(370 - 120, 70 + 125, tomorr[2]);
@@ -347,9 +372,9 @@ void drawSensors(int drawLevel)
   else if (drawLevel >= 1)
   {
     // Fill with white to erase old values
-    display.fillRect(1 * rectSpacing + 0 * rectWidth + 2, 480 + 1, rectWidth, 110, WHITE);
-    display.fillRect(2 * rectSpacing + 1 * rectWidth + 2, 480 + 1, rectWidth, 110, WHITE);
-    display.fillRect(3 * rectSpacing + 2 * rectWidth + 2, 480 + 1, rectWidth, 110, WHITE);
+    display.fillRect(1 * rectSpacing + 0 * rectWidth + 2, 480 + 5, rectWidth, 110, WHITE);
+    display.fillRect(2 * rectSpacing + 1 * rectWidth + 2, 480 + 5, rectWidth, 110, WHITE);
+    display.fillRect(3 * rectSpacing + 2 * rectWidth + 2, 480 + 5, rectWidth, 110, WHITE);
 
     // Sensor #1
     printText(sensor1[1], 1 * rectSpacing + 0 * rectWidth + textMargin, 440 + textMargin + 85, &Roboto_Light_48); // Temperature
@@ -403,9 +428,9 @@ void drawCities(int drawLevel)
 
     // Cities' names
 
-    printText(city1[0], left - 20, 90, &Roboto_Light_36);
-    printText(city2[0], left - 20, 90 + space, &Roboto_Light_36);
-    printText(city3[0], left - 20, 90 + space * 2, &Roboto_Light_36);
+    //printText(city1[0], left - 20, 90, &Roboto_Light_36);
+    //printText(city2[0], left - 20, 90 + space, &Roboto_Light_36);
+    //printText(city3[0], left - 20, 90 + space * 2, &Roboto_Light_36);
   }
   else if (drawLevel >= 1)
   {
@@ -413,6 +438,11 @@ void drawCities(int drawLevel)
     display.fillRect(left, 91, 110, 83, WHITE); // City1
     display.fillRect(left, 91 + space, 110, 83, WHITE); // City2
     display.fillRect(left, 91 + space * 2, 110, 83, WHITE); // City3
+
+    // Cities' names - Here because some letters are erased otherwise
+    printText(city1[0], left - 20, 90, &Roboto_Light_36);
+    printText(city2[0], left - 20, 90 + space, &Roboto_Light_36);
+    printText(city3[0], left - 20, 90 + space * 2, &Roboto_Light_36);
 
     // City 1
     drawWeatherIcon_small(left - 120, 55, city1[3]);

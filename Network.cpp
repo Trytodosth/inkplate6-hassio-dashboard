@@ -26,8 +26,11 @@
 
 #include <ArduinoJson.h>
 
+#include "Binary_images/no_wifi_icon.h"
+
 // Static Json from ArduinoJson library
 StaticJsonDocument<32000> doc;
+
 
 void Network::begin()
 {
@@ -46,7 +49,7 @@ void Network::begin()
     if (cnt == 20)
     {
       Serial.println("Can't connect to WIFI, restarting");
-      delay(100);
+      print_no_wifi();
       ESP.restart();
     }
   }
@@ -81,7 +84,7 @@ void Network::CheckWiFi(int nbMaxAttempts)
       if (cnt == nbMaxAttempts)
       {
         Serial.println(F("Can't connect to WIFI, restarting"));
-        delay(100);
+        print_no_wifi();
         ESP.restart();
       }
     }
@@ -139,14 +142,14 @@ bool Network::getSensorsData(char *sensor1_temp, char *sensor1_press, char *sens
   getSensorData("sensor.cuisine_temperature", friendly_name, sensor1_temp, unit);
 
   // Fetching sensors data
-  getSensorData("sensor.chambre_pression", friendly_name, sensor2_press, unit);
-  getSensorData("sensor.chambre_humidite", friendly_name, sensor2_hum, unit);
-  getSensorData("sensor.chambre_temperature", friendly_name, sensor2_temp, unit);
+  getSensorData("sensor.salon_pression", friendly_name, sensor2_press, unit);
+  getSensorData("sensor.salon_humidite", friendly_name, sensor2_hum, unit);
+  getSensorData("sensor.salon_temperature", friendly_name, sensor2_temp, unit);
 
   // Fetching sensors data
-  getSensorData("sensor.grange_pression", friendly_name, sensor3_press, unit);
-  getSensorData("sensor.grange_humidite", friendly_name, sensor3_hum, unit);
-  getSensorData("sensor.grange_temperature", friendly_name, sensor3_temp, unit);
+  getSensorData("sensor.chambre_pression", friendly_name, sensor3_press, unit);
+  getSensorData("sensor.chambre_humidite", friendly_name, sensor3_hum, unit);
+  getSensorData("sensor.chambre_temperature", friendly_name, sensor3_temp, unit);
 
   // TODO: Check to be integrated
   f = 0;
@@ -264,7 +267,7 @@ bool Network::getJSON(char entityName[])
 
   // Actually do request
   int httpCode = http.GET();
-  //Serial.println(httpCode);
+  Serial.println(httpCode);
   if (httpCode == 200) {
     // Try parsing JSON object
     DeserializationError error = deserializeJson(doc, http.getStream());
@@ -410,6 +413,34 @@ void Network::setTime()
   Serial.print(F("Current time: "));
   Serial.print(asctime(&timeinfo));
 }
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Network::print_no_wifi()
+{
+  display.clearDisplay(); // Clear Buffer
+
+  // 1bit mode: display.drawBitmap(pos_x, pos_y, progmem_const, width, height, color=BLACK | WHITE, color_bg = BLACK | WHITE);
+  display.drawBitmap(120, 220, no_wifi_icon, 200, 167, WHITE, BLACK);
+
+  // Text
+  display.setTextColor(BLACK);
+  display.setFont(&Roboto_Light_48);
+  display.setCursor(330, 280);
+  display.print(F("WiFi non trouvee"));
+  display.setFont(&Roboto_Light_36);
+  display.setCursor(330, 330);
+  display.print(F("Recherche > "));
+  display.print(WiFi_ssid);
+  display.setCursor(330, 370);
+  display.print(F("Redemarrage dans 5 sec"));
+
+  display.display();
+  delay(5000);
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////

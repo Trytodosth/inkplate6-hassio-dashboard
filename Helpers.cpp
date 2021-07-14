@@ -171,8 +171,8 @@ void eraseAndPrint(char *text, int pos_x, int pos_y, const GFXfont *f, int textC
   // Erase and then print text
   if (widthErase == 0) widthErase = (int) (strlen(text) * 36 * 0.6);
   if (heightErase == 0) heightErase = 36;
-  //Serial.println(text);
-  //Serial.println(widthErase);
+  Serial.println(text);
+  Serial.println(widthErase);
 
   if (textColor == BLACK)
     eraseText(pos_x, pos_y, widthErase, heightErase, WHITE);

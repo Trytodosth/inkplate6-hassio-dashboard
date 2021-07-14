@@ -26,13 +26,13 @@ char sensor1[4][12] = {
   "90.0",
 };
 char sensor2[4][12] = {
-  "Chambre",
+  "Salon",
   "80.0",
   "8000",
   "80.0",
 };
 char sensor3[4][12] = {
-  "Grange",
+  "Chambre",
   "70.0",
   "7000",
   "70.0",
