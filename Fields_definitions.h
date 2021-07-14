@@ -19,19 +19,19 @@ char tomorr[3][24] = {
 };
 
 // Variables for storing sensors' data
-char sensor1[4][12] = {
+char sensor1[4][16] = {
   "Cuisine",
   "90.0",
   "9000",
   "90.0",
 };
-char sensor2[4][12] = {
+char sensor2[4][16] = {
   "Salon",
   "80.0",
   "8000",
   "80.0",
 };
-char sensor3[4][12] = {
+char sensor3[4][16] = {
   "Chambre",
   "70.0",
   "7000",

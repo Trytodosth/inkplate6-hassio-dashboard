@@ -3,6 +3,8 @@
     "files.associations": {
         "random": "cpp",
         "functional": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "chrono": "cpp",
+        "limits": "cpp"
     }
 }

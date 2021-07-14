@@ -37,6 +37,7 @@ void Network::begin()
   // Initiating wifi, like in BasicHttpClient example
   WiFi.mode(WIFI_STA);
   WiFi.begin(WiFi_ssid, WiFi_pass);
+  WiFi.setSleep(false);
 
   int cnt = 0;
   Serial.print(F("Waiting for WiFi to connect..."));
@@ -59,7 +60,7 @@ void Network::begin()
   setTime();
 
   // reduce power by making WiFi module sleep
-  WiFi.setSleep(1);
+  //WiFi.setSleep(1);
 }
 
 
@@ -173,7 +174,7 @@ bool Network::getNextRainData(int &rain0min, int &rain5min, int &rain10min, int 
   bool sleep = WiFi.getSleep();
   WiFi.setSleep(false);
 
-  Serial.println(F("Fetching next rain"));
+  // Serial.println(F("Fetching next rain"));
   
   bool success;
   success = getJSON("sensor.val_d_epy_next_rain");
@@ -317,7 +318,7 @@ bool Network::getJSON(char entityName[])
 
   // Actually do request
   int httpCode = http.GET();
-  Serial.println(httpCode);
+  // Serial.println(httpCode);
   if (httpCode == 200) {
     // Try parsing JSON object
     DeserializationError error = deserializeJson(doc, http.getStream());
@@ -340,6 +341,8 @@ bool Network::getJSON(char entityName[])
       display.println(F("Network error (401), probably wrong API key"));
     } else {
       display.println(F("HTTP code not 200"));
+      Serial.print(F("Invalid HTTP code: "));
+      Serial.println(httpCode);
     }
     display.setCursor(50, 330);
     display.print(F("HTTP code: "));

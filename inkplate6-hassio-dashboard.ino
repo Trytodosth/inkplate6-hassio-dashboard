@@ -82,9 +82,9 @@ extern char today[3][24];
 extern char tomorr[3][24];
 
 // Variables for storing sensors' data
-extern char sensor1[4][12];
-extern char sensor2[4][12];
-extern char sensor3[4][12];
+extern char sensor1[4][16];
+extern char sensor2[4][16];
+extern char sensor3[4][16];
 
 // Variables for storing cities' data
 extern char city1[4][24];
@@ -366,7 +366,7 @@ void drawNextRain(int drawLevel)
   }
   else if (drawLevel >= 1)
   {
-    Serial.print(F("Plotting rain: "));
+    // Serial.print(F("Plotting rain: "));
     
     // Replace old values
     display.fillRect(left+1, height_top + height_unit, (rainNextHourDurationSum[8] + rainNextHourDuration[8]) * (width_5min + space_between),  height_unit*2 + height_min, WHITE);
