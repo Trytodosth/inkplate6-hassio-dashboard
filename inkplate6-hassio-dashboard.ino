@@ -188,7 +188,7 @@ void loop()
       drawSun(drawLevel);
     }
     drawCityName(); // On top of main icon
-    drawBattery();
+    //drawBattery();
     drawTime(); // On top of everything else
 
     if (!success) // Skipped if everyhting OK. Not selective, I know
@@ -544,21 +544,21 @@ void drawCities(int drawLevel)
     printText(city3[0], left - 20, 90 + space * 2, &Roboto_Light_36);
 
     // City 1
-    drawWeatherIcon_small(left - 120, 55, city1[3]);
+    drawWeatherIcon_small(left - 120, 60, city1[3]);
     printText(city1[1], left, 125, &Roboto_Light_36);
     printCelsiusAtCursor(&Roboto_Light_24, 24);
     printText(city1[2], left, 160, &Roboto_Light_36);
     printCelsiusAtCursor(&Roboto_Light_24, 24);
 
     // City 2
-    drawWeatherIcon_small(left - 120, 55 + space, city2[3]);
+    drawWeatherIcon_small(left - 120, 60 + space, city2[3]);
     printText(city2[1], left, 125 + space, &Roboto_Light_36);
     printCelsiusAtCursor(&Roboto_Light_24, 24);
     printText(city2[2], left, 160 + space, &Roboto_Light_36);
     printCelsiusAtCursor(&Roboto_Light_24, 24);
 
     // City 3
-    drawWeatherIcon_small(left - 120, 55 + space * 2, city3[3]);
+    drawWeatherIcon_small(left - 120, 60 + space * 2, city3[3]);
     printText(city3[1], left, 125 + space * 2, &Roboto_Light_36);
     printCelsiusAtCursor(&Roboto_Light_24, 24);
     printText(city3[2], left, 160 + space * 2, &Roboto_Light_36);

@@ -43,6 +43,9 @@ extern int drawLevel;
 
 
 // All functions defined in Network.cpp
+void Wifi_connected(WiFiEvent_t event, WiFiEventInfo_t info);
+void Get_IPAddress(WiFiEvent_t event, WiFiEventInfo_t info);
+void Wifi_disconnected(WiFiEvent_t event, WiFiEventInfo_t info);
 
 class Network
 {

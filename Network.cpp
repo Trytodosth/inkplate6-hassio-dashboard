@@ -32,12 +32,40 @@
 StaticJsonDocument<32000> doc;
 
 
+void Wifi_connected(WiFiEvent_t event, WiFiEventInfo_t info){
+  Serial.println("Successfully connected to Access Point");
+}
+
+void Get_IPAddress(WiFiEvent_t event, WiFiEventInfo_t info){
+  Serial.println("WIFI is (re)connected!");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void Wifi_disconnected(WiFiEvent_t event, WiFiEventInfo_t info){
+  Serial.println("Disconnected from WIFI access point");
+  Serial.print("WiFi lost connection. Reason: ");
+  Serial.println(info.disconnected.reason);
+  Serial.println("Reconnecting...");
+  WiFi.begin(WiFi_ssid, WiFi_pass);
+}
+
 void Network::begin()
 {
   // Initiating wifi, like in BasicHttpClient example
-  WiFi.mode(WIFI_STA);
+
+  WiFi.disconnect(true);
+  delay(1000);
+  
+
+  WiFi.onEvent(Wifi_connected,SYSTEM_EVENT_STA_CONNECTED);
+  WiFi.onEvent(Get_IPAddress, SYSTEM_EVENT_STA_GOT_IP);
+  WiFi.onEvent(Wifi_disconnected, SYSTEM_EVENT_STA_DISCONNECTED);
+
   WiFi.begin(WiFi_ssid, WiFi_pass);
-  WiFi.setSleep(false);
+
+  //WiFi.mode(WIFI_STA);
+  //WiFi.setSleep(false);
 
   int cnt = 0;
   Serial.print(F("Waiting for WiFi to connect..."));
@@ -60,7 +88,7 @@ void Network::begin()
   setTime();
 
   // reduce power by making WiFi module sleep
-  //WiFi.setSleep(1);
+  ////WiFi.setSleep(1);
 }
 
 
@@ -69,12 +97,10 @@ void Network::CheckWiFi(int nbMaxAttempts)
   // If not connected to wifi reconnect wifi
   if (WiFi.status() != WL_CONNECTED)
   {
-    WiFi.reconnect();
-
-    delay(5000);
-
+    Serial.println(F("Stalling, hoping to reconnect..."));
+    delay(1000);
+    
     int cnt = 0;
-    Serial.println(F("Waiting for WiFi to reconnect..."));
     while ((WiFi.status() != WL_CONNECTED))
     {
       // Prints a dot every second that wifi isn't connected
@@ -89,7 +115,28 @@ void Network::CheckWiFi(int nbMaxAttempts)
         ESP.restart();
       }
     }
-    Serial.println(F(" connected"));
+
+    // WiFi.reconnect();
+
+    // delay(5000);
+
+    // int cnt = 0;
+    // Serial.println(F("Waiting for WiFi to reconnect..."));
+    // while ((WiFi.status() != WL_CONNECTED))
+    // {
+    //   // Prints a dot every second that wifi isn't connected
+    //   Serial.print(F("."));
+    //   delay(1000);
+    //   ++cnt;
+
+    //   if (cnt == nbMaxAttempts)
+    //   {
+    //     Serial.println(F("Can't connect to WIFI, restarting"));
+    //     print_no_wifi();
+    //     ESP.restart();
+    //   }
+    // }
+    // Serial.println(F(" connected"));
   }
 }
 
@@ -102,7 +149,7 @@ bool Network::getLocalWeatherData(char *currentTemp, char *currentWind, char *cu
 
   // Wake up if sleeping and save inital state
   bool sleep = WiFi.getSleep();
-  WiFi.setSleep(false);
+  //WiFi.setSleep(false);
 
   getWeatherHome(currentTemp, currentWind, currentWeather, currentWeatherIcon, expectedRain,
                  today_temp_max, today_temp_min, today_icon, tomorr_temp_max, tomorr_temp_min, tomorr_icon);
@@ -111,7 +158,7 @@ bool Network::getLocalWeatherData(char *currentTemp, char *currentWind, char *cu
   f = 0;
 
   // Return to initial state
-  WiFi.setSleep(sleep);
+  //WiFi.setSleep(sleep);
 
   return !f;
 }
@@ -129,7 +176,7 @@ bool Network::getSensorsData(char *sensor1_temp, char *sensor1_press, char *sens
 
   // Wake up if sleeping and save inital state
   bool sleep = WiFi.getSleep();
-  WiFi.setSleep(false);
+  //WiFi.setSleep(false);
 
   // Temporary
   char friendly_name[24]; // Not used, too many variables
@@ -156,7 +203,7 @@ bool Network::getSensorsData(char *sensor1_temp, char *sensor1_press, char *sens
   f = 0;
 
   // Return to initial state
-  WiFi.setSleep(sleep);
+  //WiFi.setSleep(sleep);
 
   return !f;
 }
@@ -172,7 +219,7 @@ bool Network::getNextRainData(int &rain0min, int &rain5min, int &rain10min, int 
 
   // Wake up if sleeping and save inital state
   bool sleep = WiFi.getSleep();
-  WiFi.setSleep(false);
+  //WiFi.setSleep(false);
 
   // Serial.println(F("Fetching next rain"));
   
@@ -195,7 +242,7 @@ bool Network::getNextRainData(int &rain0min, int &rain5min, int &rain10min, int 
   f = 0;
 
   // Return to initial state
-  WiFi.setSleep(sleep);
+  //WiFi.setSleep(sleep);
 
   return !f;
 }
@@ -223,7 +270,7 @@ bool Network::getSunData(char *nextSunrise, char *nextSunset)
 
   // Wake up if sleeping and save inital state
   bool sleep = WiFi.getSleep();
-  WiFi.setSleep(false);
+  //WiFi.setSleep(false);
 
   // Miscellaneous, using custom HA sensors
   getState("sensor.nextsunrise", nextSunrise);
@@ -234,7 +281,7 @@ bool Network::getSunData(char *nextSunrise, char *nextSunset)
   f = 0;
 
   // Return to initial state
-  WiFi.setSleep(sleep);
+  //WiFi.setSleep(sleep);
 
   return !f;
 }
@@ -251,7 +298,7 @@ bool Network::getOtherCitiesData(char *loc1_temp_max, char *loc1_temp_min, char 
 
   // Wake up if sleeping and save inital state
   bool sleep = WiFi.getSleep();
-  WiFi.setSleep(false);
+  //WiFi.setSleep(false);
 
   // Forecasts
   getWeatherForecast("weather.villeurbanne", 0, loc1_temp_max, loc1_temp_min, loc1_icon);
@@ -262,7 +309,7 @@ bool Network::getOtherCitiesData(char *loc1_temp_max, char *loc1_temp_min, char 
   f = 0;
 
   // Return to initial state
-  WiFi.setSleep(sleep);
+  //WiFi.setSleep(sleep);
 
   return !f;
 }
@@ -279,7 +326,7 @@ bool Network::getTimestamp(char *currentTime)
 
   // Wake up if sleeping and save inital state
   bool sleep = WiFi.getSleep();
-  WiFi.setSleep(false);
+  //WiFi.setSleep(false);
 
   // Miscellaneous, using custom HA sensors
   getState("sensor.time_formatted", currentTime);
@@ -288,7 +335,7 @@ bool Network::getTimestamp(char *currentTime)
   f = 0;
 
   // Return to initial state
-  WiFi.setSleep(sleep);
+  //WiFi.setSleep(sleep);
 
   return !f;
 }
