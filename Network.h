@@ -55,6 +55,8 @@ class Network
     bool getSensorsData(char *sensor1_temp, char *sensor1_press, char *sensor1_hum,
                         char *sensor2_temp, char *sensor2_press, char *sensor2_hum,
                         char *sensor3_temp, char *sensor3_press, char *sensor3_hum);
+    bool getNextRainData(int &rain0min, int &rain5min, int &rain10min, int &rain15min, int &rain20min, int &rain25min,
+                         int &rain35min, int &rain45min, int &rain55min);
     bool getSunData(char *nextSunrise, char *nextSunset);
     bool getOtherCitiesData(char *loc1_temp_max, char *loc1_temp_min, char *loc1_icon, char *loc2_temp_max, char *loc2_temp_min, char *loc2_icon, char *loc3_temp_max, char *loc3_temp_min, char *loc3_icon);
     bool getTimestamp(char *currentTime);
@@ -67,6 +69,7 @@ class Network
     bool getJSON(char entityName[]);
     bool getState(char entityName[], char *output);
     bool getSensorData(char entityName[], char *sensor1_name, char *value, char *unit);
+    int getRainIntensity(const char *rainString);
     bool getWeatherHome(char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain,
                         char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon);
     bool getWeatherForecast(char entityName[], int indForecast, char *forecastTemperatureMax, char *forecastTemperatureMin, char *forecastIcon);

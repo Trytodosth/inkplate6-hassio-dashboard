@@ -57,3 +57,37 @@ char city3[4][24] = {
   "-5.5",
   "exceptional",
 };
+
+int rainNextHour[9] = {
+  0,
+  0,
+  1,
+  1,
+  2,
+  2,
+  1,
+  0,
+  1,
+};
+int rainNextHourDuration[9] = {
+  1,
+  1,
+  1,
+  1,
+  1,
+  2,
+  2,
+  2,
+  2,
+};
+int rainNextHourDurationSum[9] = {
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  7,
+  9,
+  11,
+};

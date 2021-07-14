@@ -128,6 +128,7 @@ void setup()
 
   // 1bit mode: display.drawBitmap(pos_x, pos_y, progmem_const, width, height, color = BLACK | WHITE, color_bg = WHITE | BLACK);
   display.drawBitmap(0, 0, Home_screen2, 800, 600, WHITE, BLACK);
+  printText((char *)F("Bienvenue !"), 270, 100, &Roboto_Light_48);
   display.display();
   delay(1000);
 
@@ -149,6 +150,7 @@ void setup()
   drawCityName();
   drawTime();
   drawWeather(0);
+  drawNextRain(0);
   drawSensors(0);
   drawCities(0);
   drawSun(0);
@@ -168,6 +170,10 @@ void loop()
                 sensor2[1], sensor2[2], sensor2[3],
                 sensor3[1], sensor3[2], sensor3[3]);
       drawSensors(drawLevel);
+      success = success && network.getNextRainData(rainNextHour[0], rainNextHour[1], rainNextHour[2],
+                rainNextHour[3], rainNextHour[4], rainNextHour[5],
+                rainNextHour[6], rainNextHour[7], rainNextHour[8]);
+      drawNextRain(drawLevel);
     }
     if (refreshes % LOCAL_REFRESH_MOD == 0) { // Updating local weather info
       success = success && network.getLocalWeatherData(currentTemp, currentWind, currentWeather, currentWeatherIcon, expectedRain, today[0], today[1], today[2], tomorr[0], tomorr[1], tomorr[2]);
@@ -311,6 +317,89 @@ void drawWeather(int drawLevel)
 }
 
 
+////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+// Function for drawing Sun info
+void drawNextRain(int drawLevel)
+{
+  int height_top = 450;
+  int space_between = 4;
+  int width_5min = 20;
+  int height_unit = 30;
+  int height_min = 2;
+  int left = 40;
+
+  char cstr[8];
+  // drawLevel: 0: Background only
+  // drawLevel: 1: Background + values
+  // drawlevel: 2: Values refresh
+
+
+  if (drawLevel <= 1)
+  {
+    // Draw background
+    printText((char *)F("Pluie dans l'heure :"), left+50, height_top+14, &Roboto_Light_24);
+    
+    // Horizontal
+    display.fillRect(left, height_top + height_unit*3 + height_min + 1, (rainNextHourDurationSum[8] + rainNextHourDuration[8]) * (width_5min + space_between) + 5, 1, BLACK);
+    
+    display.fillRect(left-3, height_top + height_unit*3 + height_min, 5, 1, BLACK);
+    display.fillRect(left-3, height_top + height_unit*2 + height_min, 5, 1, BLACK);
+    display.fillRect(left-3, height_top + height_unit*1 + height_min, 5, 1, BLACK);
+    printText((char *)F("0"), left - 27, height_top + height_unit*3 + height_min +8, &Roboto_Light_24);
+    printText((char *)F("1"), left - 27, height_top + height_unit*2 + height_min +8, &Roboto_Light_24);
+    printText((char *)F("2"), left - 27, height_top + height_unit*1 + height_min +8, &Roboto_Light_24);
+    
+    // Vertical
+    display.fillRect(left, height_top + height_unit*0.5 - 3, 1, height_unit*2.5 + height_min + 5, BLACK);
+
+    // Vertical
+    for (int i = 0; i < 9; i++) {
+      display.fillRect(left + (rainNextHourDurationSum[i] + rainNextHourDuration[i]*0.5) * (width_5min + space_between) - 0.5*space_between, height_top + height_unit*3 + height_min +1, 1, 3, BLACK);
+      //itoa(rainNextHour[i], cstr, 6);
+      
+      //printText(cstr, left + (rainNextHourDurationSum[i] + rainNextHourDuration[i]*0.5) * (width_5min + space_between) - 0.5*space_between, height_top + height_unit*3 + height_min + 30, &Roboto_Light_24); // Minutes
+    }
+    printText((char *)F("Mnt."), left-10, height_top + height_unit*3 + height_min + 30, &Roboto_Light_24); // Minutes
+    printText((char *)F("+30min"), left + (rainNextHourDurationSum[8] + rainNextHourDuration[8])*0.5 * (width_5min + space_between) - 4*9, height_top + height_unit*3 + height_min + 30, &Roboto_Light_24); // Minutes
+    printText((char *)F("+1h"), left + (rainNextHourDurationSum[8] + rainNextHourDuration[8]) * (width_5min + space_between) - 3*9, height_top + height_unit*3 + height_min + 30, &Roboto_Light_24); // Minutes
+  }
+  else if (drawLevel >= 1)
+  {
+    Serial.print(F("Plotting rain: "));
+    
+    // Replace old values
+    display.fillRect(left+1, height_top + height_unit, (rainNextHourDurationSum[8] + rainNextHourDuration[8]) * (width_5min + space_between),  height_unit*2 + height_min, WHITE);
+
+    int maxRain = 0;
+    for (int i = 0; i < 9; i++) {
+      if(rainNextHour[i] > maxRain)
+      {
+        maxRain = rainNextHour[i];
+      }
+    }
+
+    for (int i = 0; i < 9; i++) {
+      display.fillRect(left + (rainNextHourDurationSum[i]) * (width_5min + space_between), height_top + height_unit * (3-rainNextHour[i]) + height_min,
+                        rainNextHourDuration[i] * width_5min + space_between*(rainNextHourDuration[i]-1), rainNextHour[i] * height_unit + height_min, BLACK);
+//      Serial.print(i);
+//      Serial.print(F(": "));
+//      Serial.print(rainNextHour[i]);
+//      Serial.print(F(" ; "));
+//      Serial.print(rainNextHourDuration[i]);
+//      Serial.print(F(" ; "));
+//      Serial.println(rainNextHourDurationSum[i]);
+    }
+    
+    if (maxRain == 0)
+    {
+      printText((char *)F("Pas de pluie dans l'heure !"), left + 10, height_top + height_unit*2+5, &Roboto_Light_24);
+    }
+  }
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -348,57 +437,67 @@ void drawSensors(int drawLevel)
 
   // Defining the grid
   int rectWidth = 240;
+  int left = 395;
+  int left_spacing = 160;
   int rectThickness = 2;
-  int rectSpacing = (800 - rectWidth * 3) / 4;
+  int rectSpacing = 50;
   int textMargin = 6;
+  int height_top = 470; // 440
 
   if (drawLevel <= 1)
   {
     // Horizontal
-    display.fillRect(1 * rectSpacing + 0 * rectWidth, 480, rectWidth - 50, 1, BLACK);
-    display.fillRect(2 * rectSpacing + 1 * rectWidth, 480, rectWidth - 50, 1, BLACK);
-    display.fillRect(3 * rectSpacing + 2 * rectWidth, 480, rectWidth - 50, 1, BLACK);
+//    display.fillRect(1 * rectSpacing + 0 * rectWidth, height_top + 40, rectWidth - 50, 1, BLACK);
+//    display.fillRect(2 * rectSpacing + 1 * rectWidth, height_top + 40, rectWidth - 50, 1, BLACK);
+//    display.fillRect(3 * rectSpacing + 2 * rectWidth, height_top + 40, rectWidth - 50, 1, BLACK);
 
     // Vertical
-    display.fillRect(1 * rectSpacing + 0 * rectWidth, 440, 2, 150, BLACK);
-    display.fillRect(2 * rectSpacing + 1 * rectWidth, 440, 2, 150, BLACK);
-    display.fillRect(3 * rectSpacing + 2 * rectWidth, 440, 2, 150, BLACK);
+    display.fillRect(left - 10, height_top-35, 2, rectSpacing*3, BLACK);
+//    display.fillRect(2 * rectSpacing + 1 * rectWidth, height_top, 2, 150, BLACK);
+//    display.fillRect(3 * rectSpacing + 2 * rectWidth, height_top, 2, 150, BLACK);
 
     // Sensor names (fixed)
-    printText(sensor1[0], 1 * rectSpacing + 0 * rectWidth + textMargin, 440 + textMargin + 30, &Roboto_Light_36); // Name
-    printText(sensor2[0], 2 * rectSpacing + 1 * rectWidth + textMargin, 440 + textMargin + 30, &Roboto_Light_36); // Name
-    printText(sensor3[0], 3 * rectSpacing + 2 * rectWidth + textMargin, 440 + textMargin + 30, &Roboto_Light_36); // Name
+    printText(sensor1[0], left, height_top, &Roboto_Light_36); // Name
+    printText(sensor2[0], left, height_top + rectSpacing, &Roboto_Light_36); // Name
+    printText(sensor3[0], left, height_top + rectSpacing*2, &Roboto_Light_36); // Name
   }
   else if (drawLevel >= 1)
   {
     // Fill with white to erase old values
-    display.fillRect(1 * rectSpacing + 0 * rectWidth + 2, 480 + 5, rectWidth, 110, WHITE);
-    display.fillRect(2 * rectSpacing + 1 * rectWidth + 2, 480 + 5, rectWidth, 110, WHITE);
-    display.fillRect(3 * rectSpacing + 2 * rectWidth + 2, 480 + 5, rectWidth, 110, WHITE);
+    display.fillRect(left + left_spacing, height_top, rectWidth, 110, WHITE);
 
     // Sensor #1
-    printText(sensor1[1], 1 * rectSpacing + 0 * rectWidth + textMargin, 440 + textMargin + 85, &Roboto_Light_48); // Temperature
+    printText(sensor1[1], left + left_spacing, height_top, &Roboto_Light_48); // Temperature
     printCelsiusAtCursor(&Roboto_Light_24, 24);
-    printText(sensor1[2], 1 * rectSpacing + 0 * rectWidth + textMargin, 440 + textMargin + 135, &Roboto_Light_36); // Pressure
-    printTextAtCursor((char *)F("hPa / "), &Roboto_Light_24);
+    printTextAtCursor((char *)F("  "), &Roboto_Light_24);
     printTextAtCursor(sensor1[3], &Roboto_Light_36);    // Humidity
     printTextAtCursor((char *)F("%"), &Roboto_Light_24);
+    //printText(sensor1[2], 1 * rectSpacing + 0 * rectWidth + textMargin, height_top + textMargin + 135, &Roboto_Light_36); // Pressure
+    //printTextAtCursor((char *)F("hPa / "), &Roboto_Light_24);
+    //printTextAtCursor(sensor1[3], &Roboto_Light_36);    // Humidity
+    //printTextAtCursor((char *)F("%"), &Roboto_Light_24);
 
     // Sensor #2
-    printText(sensor2[1], 2 * rectSpacing + 1 * rectWidth + textMargin, 440 + textMargin + 85, &Roboto_Light_48); // Temperature
+    printText(sensor2[1], left + left_spacing, height_top + rectSpacing, &Roboto_Light_48); // Temperature
     printCelsiusAtCursor(&Roboto_Light_24, 24);
-    printText(sensor2[2], 2 * rectSpacing + 1 * rectWidth + textMargin, 440 + textMargin + 135, &Roboto_Light_36); // Pressure
-    printTextAtCursor((char *)F("hPa / "), &Roboto_Light_24);
+    printTextAtCursor((char *)F("  "), &Roboto_Light_24);
     printTextAtCursor(sensor2[3], &Roboto_Light_36);    // Humidity
     printTextAtCursor((char *)F("%"), &Roboto_Light_24);
+    //printText(sensor2[2], 2 * rectSpacing + 1 * rectWidth + textMargin, height_top + textMargin + 135, &Roboto_Light_36); // Pressure
+    //printTextAtCursor((char *)F("hPa / "), &Roboto_Light_24);
+    //printTextAtCursor(sensor2[3], &Roboto_Light_36);    // Humidity
+    //printTextAtCursor((char *)F("%"), &Roboto_Light_24);
 
     // Sensor #3
-    printText(sensor3[1], 3 * rectSpacing + 2 * rectWidth + textMargin, 440 + textMargin + 85, &Roboto_Light_48); // Temperature
+    printText(sensor3[1], left + left_spacing, height_top + rectSpacing*2, &Roboto_Light_48); // Temperature
     printCelsiusAtCursor(&Roboto_Light_24, 24);
-    printText(sensor3[2], 3 * rectSpacing + 2 * rectWidth + textMargin, 440 + textMargin + 135, &Roboto_Light_36); // Pressure
-    printTextAtCursor((char *)F("hPa / "), &Roboto_Light_24);
+    printTextAtCursor((char *)F("  "), &Roboto_Light_24);
     printTextAtCursor(sensor3[3], &Roboto_Light_36);    // Humidity
     printTextAtCursor((char *)F("%"), &Roboto_Light_24);
+    //printText(sensor3[2], 3 * rectSpacing + 2 * rectWidth + textMargin, height_top + textMargin + 135, &Roboto_Light_36); // Pressure
+    //printTextAtCursor((char *)F("hPa / "), &Roboto_Light_24);
+    //printTextAtCursor(sensor3[3], &Roboto_Light_36);    // Humidity
+    //printTextAtCursor((char *)F("%"), &Roboto_Light_24);
   }
 }
 

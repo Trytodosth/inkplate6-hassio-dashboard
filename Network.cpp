@@ -160,6 +160,56 @@ bool Network::getSensorsData(char *sensor1_temp, char *sensor1_press, char *sens
   return !f;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool Network::getNextRainData(int &rain0min, int &rain5min, int &rain10min, int &rain15min, int &rain20min, int &rain25min,
+                              int &rain35min, int &rain45min, int &rain55min)
+{
+  bool f = 0;
+  CheckWiFi();
+
+  // Wake up if sleeping and save inital state
+  bool sleep = WiFi.getSleep();
+  WiFi.setSleep(false);
+
+  Serial.println(F("Fetching next rain"));
+  
+  bool success;
+  success = getJSON("sensor.val_d_epy_next_rain");
+  if (!success)
+    return success;
+
+  rain0min = getRainIntensity(doc["attributes"]["1_hour_forecast"]["0 min"].as<char *>());
+  rain5min = getRainIntensity(doc["attributes"]["1_hour_forecast"]["5 min"].as<char *>());
+  rain10min = getRainIntensity(doc["attributes"]["1_hour_forecast"]["10 min"].as<char *>());
+  rain15min = getRainIntensity(doc["attributes"]["1_hour_forecast"]["15 min"].as<char *>());
+  rain20min = getRainIntensity(doc["attributes"]["1_hour_forecast"]["20 min"].as<char *>());
+  rain25min = getRainIntensity(doc["attributes"]["1_hour_forecast"]["25 min"].as<char *>());
+  rain35min = getRainIntensity(doc["attributes"]["1_hour_forecast"]["35 min"].as<char *>());
+  rain45min = getRainIntensity(doc["attributes"]["1_hour_forecast"]["45 min"].as<char *>());
+  rain55min = getRainIntensity(doc["attributes"]["1_hour_forecast"]["55 min"].as<char *>());
+  
+  // TODO: Check to be integrated
+  f = 0;
+
+  // Return to initial state
+  WiFi.setSleep(sleep);
+
+  return !f;
+}
+
+int Network::getRainIntensity(const char *rainString)
+{
+  if (strcmp(rainString, "Temps sec") == 0) { return 0; }
+  if (strcmp(rainString, "Pluie faible") == 0) { return 1; }
+  if (strcmp(rainString, "Pluie modérée") == 0) { return 2; }
+  if (strcmp(rainString, "Pluie forte") == 0) { return 3; }
+  
+  Serial.print(F("Error next Rain: "));
+  Serial.println(rainString);
+  return 0;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
