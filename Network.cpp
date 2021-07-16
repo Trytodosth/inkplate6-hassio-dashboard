@@ -72,7 +72,7 @@ void Network::begin()
   while ((WiFi.status() != WL_CONNECTED))
   {
     Serial.print(F("."));
-    delay(1000);
+    delay(5000);
     ++cnt;
 
     if (cnt == 20)
@@ -98,14 +98,14 @@ void Network::CheckWiFi(int nbMaxAttempts)
   if (WiFi.status() != WL_CONNECTED)
   {
     Serial.println(F("Stalling, hoping to reconnect..."));
-    delay(1000);
+    delay(5000);
     
     int cnt = 0;
     while ((WiFi.status() != WL_CONNECTED))
     {
       // Prints a dot every second that wifi isn't connected
       Serial.print(F("."));
-      delay(1000);
+      delay(5000);
       ++cnt;
 
       if (cnt == nbMaxAttempts)

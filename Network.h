@@ -52,7 +52,7 @@ class Network
   public:
     // Functions we can access in main file
     void begin();
-    void CheckWiFi(int nbMaxAttempts = 10);
+    void CheckWiFi(int nbMaxAttempts = 15);
     bool getLocalWeatherData(char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain,
                              char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon);
     bool getSensorsData(char *sensor1_temp, char *sensor1_press, char *sensor1_hum,
