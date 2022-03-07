@@ -1,7 +1,6 @@
 {
-    "port": "COM5",
-    "board": "Croduino_Boards:Inkplate:Inkplate6",
-    "configuration": "PSRAM=enabled,PartitionScheme=huge_app,CPUFreq=240,UploadSpeed=115200,DebugLevel=warn",
-    "sketch": "inkplate6-hassio-dashboard.ino",
-    "output": "../ArduinoOutput"
+    "port": "COM3",
+    "board": "Croduino_Boards:esp32:Inkplate6",
+    "configuration": "PSRAM=enabled,PartitionScheme=huge_app,CPUFreq=240,UploadSpeed=115200,DebugLevel=info",
+    "sketch": "Test_other_controls.ino"
 }
