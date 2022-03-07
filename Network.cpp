@@ -291,6 +291,8 @@ bool Network::getState(char entityName[], char *output)
 
   // Extracting Info from JSON
   strcpy(output, doc["state"].as<char *>());
+  
+  return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -307,6 +309,8 @@ bool Network::getSensorData(char entityName[], char *friendlyName, char *value, 
   strcpy(friendlyName, doc["attributes"]["friendly_name"].as<char *>());
   strcpy(value, doc["state"].as<char *>());
   strcpy(unit, doc["attributes"]["unit_of_measurement"].as<char *>());
+  
+  return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -331,6 +335,7 @@ bool Network::getField(Field &field)
 
   Serial.print ("Read value: ");
   Serial.println(field.Value);
+
   return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -373,6 +378,28 @@ bool Network::getCityWeather(City &city)
     city.Forecasts[indForecast].setWindSpeed(doc["attributes"]["forecast"][indForecast]["wind_speed"].as<float>());
   }
   //dtostrf(doc["attributes"]["forecast"][indForecast]["temperature"].as<double>(), 4, 1, forecastTemperatureMax);
+
+  return true;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool Network::getRoomData(Room &room)
+{
+  bool success;
+  success = getJSON(room.ApiIdTemperature);
+  Serial.print("Trying to fetch weather data from ");
+  Serial.print(room.Name);
+  Serial.print(" at ");
+  Serial.println(room.ApiIdTemperature);
+
+  if (!success)
+    return false;
+
+  Serial.println("Getting the temperature");
+  room.setTemperature(doc["state"].as<char *>());
 
   return true;
 }

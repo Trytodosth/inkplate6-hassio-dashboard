@@ -22,6 +22,7 @@
 #include <WiFiClientSecure.h>
 
 #include "City.h"
+#include "Room.h"
 #include "Field.h"
 
 extern const GFXfont Roboto_Light_36;
@@ -59,6 +60,7 @@ public:
   void iconAbbr(char *iconOutput, const char *weatherState);
 
   bool getCityWeather(City &city);
+  bool getRoomData(Room &room);
   bool getField(Field &field);
 
   // Used for storing retrieved data timestamp

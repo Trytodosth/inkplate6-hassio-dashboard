@@ -15,7 +15,7 @@
 #include "Fonts/Roboto_Light_72.h"
 
 Inkplate display(INKPLATE_1BIT); // Resolution 1024 x 758
-Network network; // Network object
+Network network;                 // Network object
 
 Room Rooms[3];
 WeatherForecast Forecasts[4];
@@ -34,24 +34,42 @@ void setup()
     display.setTextColor(BLACK, WHITE);
     display.setTextSize(1);
 
+    // Initialize touchscreen
+    if (!display.tsInit(true))
+        Serial.println("Touchscreen init failed!");
+
+    display.clearDisplay();
+    display.setCursor(200, 200);
+    display.setFont(&Roboto_Light_72);
+    display.print(F("It's getting quite long"));
+    display.setCursor(200, 280);
+    display.setFont(&Roboto_Light_36);
+    display.print(F("That's what she said"));
+    display.display();
+
+    // Initialize objects
     Cities[0] = City("Epy", "weather.val_d_epy", 0);
     Cities[1] = City("Suhr", "weather.suhr", 0);
     Cities[2] = City("Lyon", "weather.villeurbanne", 0);
     Cities[3] = City("Chambly", "weather.chambly", -6);
 
-    Sunrise = Field("Sunrise", "sensor.nextsunrise", 60*12);
-    Sunset = Field("Sunset", "sensor.nextsunset", 60*12);
+    Rooms[0] = Room("Cuisine", "sensor.cuisine_temperature", "sensor.cuisine_pression", "sensor.cuisine_humidite");
+    Rooms[1] = Room("Salon", "sensor.salon_temperature", "sensor.salon_pression", "sensor.salon_humidite");
+    Rooms[2] = Room("Chambre", "sensor.chambre_temperature", "sensor.chambre_pression", "sensor.chambre_humidite");
+
+    Sunrise = Field("Sunrise", "sensor.nextsunrise", 60 * 12);
+    Sunset = Field("Sunset", "sensor.nextsunset", 60 * 12);
     TimeServer = Field("Time", "sensor.time_formatted", 1);
 
-    // Initialize touchscreen
-    if (!display.tsInit(true))
-        Serial.println("Touchscreen init failed!");
+    display.setCursor(200, 420);
+    display.setFont(&Roboto_Light_24);
+    display.print(F("Activating your 5G-Moderna chip"));
+    display.partialUpdate();
 
     // Initiating Network
     network.begin(); // Before the delay: hidden waiting
 
     // Call main draw function defined below
-    
 }
 
 void loop()
@@ -60,12 +78,14 @@ void loop()
     updateFields();
     Serial.println("Fetching Weathers");
     updateWeathers();
-    Serial.println("Fetching Fields");
-    displayHomePage();
+    Serial.println("Fetching Sensors");
+    updateSensors();
     
-    delay(20000);
-}
+    Serial.println("Making it nice");
+    displayHomePage();
 
+    delay(10000);
+}
 
 void updateFields()
 {
@@ -75,9 +95,16 @@ void updateFields()
 }
 void updateWeathers()
 {
-    for (size_t i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         network.getCityWeather(Cities[i]);
+    }
+}
+void updateSensors()
+{
+    for (int i = 0; i < 3; i++)
+    {
+        network.getRoomData(Rooms[i]);
     }
 }
 
@@ -87,6 +114,7 @@ void displayHomePage()
     display.clearDisplay(); // Clear content in frame buffer
 
     drawWeatherNow(100, 150, Cities[0].ActualWeather);
+
     for (size_t i = 1; i < 4; i++)
     {
         drawForecastSmall(750, -110 + i * 160, Cities[i].Forecasts[0], Cities[i].Name);
@@ -94,7 +122,11 @@ void displayHomePage()
         {
             display.drawFastHLine(800, -120 + i * 160, 150, BLACK);
         }
-        
+    }
+    
+    for (int i = 0; i < 3; i++)
+    {
+        drawRoom(650, 550 + 70 * i, Rooms[i]);
     }
 
     drawSunriseIcon(310, 380);
@@ -102,10 +134,9 @@ void displayHomePage()
 
     drawSunsetIcon(310, 450);
     drawField(370, 480, Sunset);
-    
+
     drawField(20, 50, TimeServer);
 
-    
     display.setCursor(150, 100);
     display.setFont(&Roboto_Light_72);
     display.print(F("Val-d'Epy"));
@@ -114,6 +145,18 @@ void displayHomePage()
     Serial.println(" Done");
 }
 
+void drawRoom(int X, int Y, const Room &room)
+{
+    display.setFont(&Roboto_Light_36);
+
+    display.setCursor(X, Y);
+    display.print(room.Name);
+
+    display.setCursor(X + 190, Y);
+    display.print(room.Temperature.Value);
+    moveCursor(2, -12);
+    printCelsiusAtCursor(&Roboto_Light_24, 24);
+}
 
 void drawField(int X, int Y, const Field &field)
 {
@@ -203,7 +246,7 @@ void drawForecastFull(int X, int Y, WeatherForecast &forecast)
 
 void drawForecastSmall(int X, int Y, WeatherForecast &forecast, char *title)
 {
-    drawWeatherIcon_small(X, Y+30, forecast.Weather);
+    drawWeatherIcon_small(X, Y + 30, forecast.Weather);
 
     display.setFont(&Roboto_Light_36);
     display.setCursor(X + 85, Y + 36);
@@ -220,9 +263,7 @@ void drawForecastSmall(int X, int Y, WeatherForecast &forecast, char *title)
     display.print(forecast.TemperatureMin);
     moveCursor(2, -12);
     printCelsiusAtCursor(&Roboto_Light_24, 24);
-
 }
-
 
 void drawWeatherNow(int X, int Y, WeatherNow &weather)
 {

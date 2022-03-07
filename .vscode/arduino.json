@@ -3,5 +3,5 @@
     "board": "Croduino_Boards:Inkplate:Inkplate6plus",
     "port": "COM4",
     "output": "../buildArduino",
-    "sketch": "Test_Classes.ino"
+    "sketch": "inkplate6-hassio-dashboard.ino"
 }
