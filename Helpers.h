@@ -3,11 +3,12 @@
 #include <Inkplate.h>
 
 extern Inkplate display;
-
+extern char abbrs[15][24];
 // Global functions
 
 #ifndef HELPERS_H
 #define HELPERS_H
+
 
 // Weather icons
 void drawWeatherIcon_small(int pos_x, int pos_y, char *icon_abbr);
@@ -34,5 +35,6 @@ void eraseText(int pos_x, int pos_y, int w, int h, int color = BLACK);
 void eraseTextAtCursor(int w, int h, int color = WHITE);
 void eraseAndPrint(char *text, int pos_x, int pos_y, const GFXfont *f, int textColor = BLACK, int widthErase = 0, int heightErase = 0);
 
+void moveCursor(int deltaX, int deltaY);
 
 #endif

@@ -18,7 +18,13 @@
 // They have been declared in seperate file to increase readability
 
 #include "Network.h"
-#include "Secrets.h"  // WIFI credentials and Hassio parameters
+#include "Secrets.h" // WIFI credentials and Hassio parameters
+
+#include "City.h"
+#include "WeatherForecast.h"
+#include "WeatherNow.h"
+#include "Room.h"
+#include "Field.h"
 
 #include <HTTPClient.h>
 #include <WiFi.h>
@@ -30,7 +36,6 @@
 
 // Static Json from ArduinoJson library
 StaticJsonDocument<32000> doc;
-
 
 void Network::begin()
 {
@@ -62,7 +67,6 @@ void Network::begin()
   //WiFi.setSleep(1);
 }
 
-
 void Network::CheckWiFi(int nbMaxAttempts)
 {
   // If not connected to wifi reconnect wifi
@@ -92,30 +96,6 @@ void Network::CheckWiFi(int nbMaxAttempts)
   }
 }
 
-
-bool Network::getLocalWeatherData(char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain,
-                                  char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon)
-{
-  bool f = 0;
-  CheckWiFi();
-
-  // Wake up if sleeping and save inital state
-  bool sleep = WiFi.getSleep();
-  WiFi.setSleep(false);
-
-  getWeatherHome(currentTemp, currentWind, currentWeather, currentWeatherIcon, expectedRain,
-                 today_temp_max, today_temp_min, today_icon, tomorr_temp_max, tomorr_temp_min, tomorr_icon);
-
-  // TODO: Check to be integrated
-  f = 0;
-
-  // Return to initial state
-  WiFi.setSleep(sleep);
-
-  return !f;
-}
-
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -132,7 +112,7 @@ bool Network::getSensorsData(char *sensor1_temp, char *sensor1_press, char *sens
 
   // Temporary
   char friendly_name[24]; // Not used, too many variables
-  char unit[8]; // Not used, too many variables
+  char unit[8];           // Not used, too many variables
 
   Serial.println(F("Initiating data collection from HA server"));
 
@@ -174,7 +154,7 @@ bool Network::getNextRainData(int &rain0min, int &rain5min, int &rain10min, int 
   WiFi.setSleep(false);
 
   Serial.println(F("Fetching next rain"));
-  
+
   bool success;
   success = getJSON("sensor.val_d_epy_next_rain");
   if (!success)
@@ -189,7 +169,7 @@ bool Network::getNextRainData(int &rain0min, int &rain5min, int &rain10min, int 
   rain35min = getRainIntensity(doc["attributes"]["1_hour_forecast"]["35 min"].as<char *>());
   rain45min = getRainIntensity(doc["attributes"]["1_hour_forecast"]["45 min"].as<char *>());
   rain55min = getRainIntensity(doc["attributes"]["1_hour_forecast"]["55 min"].as<char *>());
-  
+
   // TODO: Check to be integrated
   f = 0;
 
@@ -201,11 +181,23 @@ bool Network::getNextRainData(int &rain0min, int &rain5min, int &rain10min, int 
 
 int Network::getRainIntensity(const char *rainString)
 {
-  if (strcmp(rainString, "Temps sec") == 0) { return 0; }
-  if (strcmp(rainString, "Pluie faible") == 0) { return 1; }
-  if (strcmp(rainString, "Pluie modérée") == 0) { return 2; }
-  if (strcmp(rainString, "Pluie forte") == 0) { return 3; }
-  
+  if (strcmp(rainString, "Temps sec") == 0)
+  {
+    return 0;
+  }
+  if (strcmp(rainString, "Pluie faible") == 0)
+  {
+    return 1;
+  }
+  if (strcmp(rainString, "Pluie modérée") == 0)
+  {
+    return 2;
+  }
+  if (strcmp(rainString, "Pluie forte") == 0)
+  {
+    return 3;
+  }
+
   Serial.print(F("Error next Rain: "));
   Serial.println(rainString);
   return 0;
@@ -214,90 +206,9 @@ int Network::getRainIntensity(const char *rainString)
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-bool Network::getSunData(char *nextSunrise, char *nextSunset)
-{
-  bool f = 0;
-  CheckWiFi();
-
-  // Wake up if sleeping and save inital state
-  bool sleep = WiFi.getSleep();
-  WiFi.setSleep(false);
-
-  // Miscellaneous, using custom HA sensors
-  getState("sensor.nextsunrise", nextSunrise);
-  getState("sensor.nextsunset", nextSunset);
-
-
-  // TODO: Check to be integrated
-  f = 0;
-
-  // Return to initial state
-  WiFi.setSleep(sleep);
-
-  return !f;
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-bool Network::getOtherCitiesData(char *loc1_temp_max, char *loc1_temp_min, char *loc1_icon, char *loc2_temp_max, char *loc2_temp_min, char *loc2_icon, char *loc3_temp_max, char *loc3_temp_min, char *loc3_icon)
-{
-  bool f = 0;
-  CheckWiFi();
-
-  // Wake up if sleeping and save inital state
-  bool sleep = WiFi.getSleep();
-  WiFi.setSleep(false);
-
-  // Forecasts
-  getWeatherForecast("weather.villeurbanne", 0, loc1_temp_max, loc1_temp_min, loc1_icon);
-  getWeatherForecast("weather.suhr", 0, loc2_temp_max, loc2_temp_min, loc2_icon);
-  getWeatherForecast("weather.chambly", 0, loc3_temp_max, loc3_temp_min, loc3_icon);
-
-  // TODO: Check to be integrated
-  f = 0;
-
-  // Return to initial state
-  WiFi.setSleep(sleep);
-
-  return !f;
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-bool Network::getTimestamp(char *currentTime)
-{
-  bool f = 0;
-  CheckWiFi();
-
-  // Wake up if sleeping and save inital state
-  bool sleep = WiFi.getSleep();
-  WiFi.setSleep(false);
-
-  // Miscellaneous, using custom HA sensors
-  getState("sensor.time_formatted", currentTime);
-
-  // TODO: Check to be integrated
-  f = 0;
-
-  // Return to initial state
-  WiFi.setSleep(sleep);
-
-  return !f;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 // Gets the JSON associated to an API request. Saves it in the doc object
 // Careful, each request is time / energy consumming !
-bool Network::getJSON(char entityName[])
+bool Network::getJSON(const char entityName[])
 {
   bool success = false;
   doc.clear();
@@ -313,32 +224,43 @@ bool Network::getJSON(char entityName[])
   // Initiate http
   http.begin(url);
   http.addHeader("Content-Type", "application/json");
-  http.addHeader("Authorization",  HAtoken);
+  http.addHeader("Authorization", HAtoken);
 
   // Actually do request
   int httpCode = http.GET();
-  Serial.println(httpCode);
-  if (httpCode == 200) {
+  // Serial.println(httpCode);
+  if (httpCode == 200)
+  {
     // Try parsing JSON object
     DeserializationError error = deserializeJson(doc, http.getStream());
 
     // If an error happens print it to Serial monitor
-    if (error) {
+    if (error)
+    {
       Serial.print(F("deserializeJson() failed: "));
       Serial.println(entityName);
       Serial.println(error.c_str());
-    } else {
+    }
+    else
+    {
       // Everything is OK, JSON extracted, do your stuff
       success = true;
     }
-  } else if (httpCode < 0) {
+  }
+  else if (httpCode < 0)
+  {
     Serial.println(F("Negative HTTP code (internal error)"));
-  } else {
+  }
+  else
+  {
     display.clearDisplay();
     display.setCursor(50, 290);
-    if (httpCode == 401) {
+    if (httpCode == 401)
+    {
       display.println(F("Network error (401), probably wrong API key"));
-    } else {
+    }
+    else
+    {
       display.println(F("HTTP code not 200"));
     }
     display.setCursor(50, 330);
@@ -350,7 +272,7 @@ bool Network::getJSON(char entityName[])
     display.display();
     delay(5000);
     display.clearDisplay();
-    drawLevel = 1; // Next calls will redraw background we just removed! (+ values)
+    //drawLevel = 1; // Next calls will redraw background we just removed! (+ values)
   }
 
   // Stop http
@@ -358,7 +280,6 @@ bool Network::getJSON(char entityName[])
 
   return success;
 }
-
 
 // Gets the state and save is in output
 bool Network::getState(char entityName[], char *output)
@@ -374,7 +295,6 @@ bool Network::getState(char entityName[], char *output)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 bool Network::getSensorData(char entityName[], char *friendlyName, char *value, char *unit)
 {
@@ -392,47 +312,69 @@ bool Network::getSensorData(char entityName[], char *friendlyName, char *value, 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Network::getWeatherHome(char *currentTemp, char *currentWind, char *currentWeather, char *currentWeatherIcon, char *expectedRain,
-                             char *today_temp_max, char *today_temp_min, char *today_icon, char *tomorr_temp_max, char *tomorr_temp_min, char *tomorr_icon)
+bool Network::getField(Field &field)
 {
+  if (!field.updateNeeded())
+    return true;
+
   bool success;
-  success = getJSON("weather.val_d_epy");
+  success = getJSON(field.ApiID);
+  Serial.print("Trying to fetch weather data from ");
+  Serial.print(field.Name);
+  Serial.print(" at ");
+  Serial.println(field.ApiID);
+
   if (!success)
-    return success;
+    return false;
 
-  // Extracting Info from JSON
-  //Current conditions
-  strcpy(currentWeather, doc["state"].as<char *>());
-  dtostrf(doc["attributes"]["temperature"].as<double>(), 4, 1, currentTemp);
-  dtostrf(doc["attributes"]["wind_speed"].as<double>(), 4, 1, currentWind);
-  dtostrf(doc["attributes"]["forecast"][0]["precipitation"].as<double>(), 4, 1, expectedRain);
-  iconAbbr(currentWeatherIcon, doc["state"].as<char *>());
+  field.setValue(doc["state"].as<char *>());
 
-  // Forecast today
-  dtostrf(doc["attributes"]["forecast"][0]["temperature"].as<double>(), 4, 1, today_temp_max);
-  dtostrf(doc["attributes"]["forecast"][0]["templow"].as<double>(), 4, 1, today_temp_min);
-  iconAbbr(today_icon, doc["attributes"]["forecast"][0]["condition"].as<char *>());
-
-  // Forecast tomorrow
-  dtostrf(doc["attributes"]["forecast"][1]["temperature"].as<double>(), 4, 1, tomorr_temp_max);
-  dtostrf(doc["attributes"]["forecast"][1]["templow"].as<double>(), 4, 1, tomorr_temp_min);
-  iconAbbr(tomorr_icon, doc["attributes"]["forecast"][1]["condition"].as<char *>());
+  Serial.print ("Read value: ");
+  Serial.println(field.Value);
+  return true;
 }
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Network::getWeatherForecast(char entityName[], int indForecast, char *forecastTemperatureMax, char *forecastTemperatureMin, char *forecastIcon)
+bool Network::getCityWeather(City &city)
 {
+  if (!city.updateNeeded())
+    return true;
+
   bool success;
-  success = getJSON(entityName);
+  success = getJSON(city.ApiID);
+  Serial.print("Trying to fetch weather data from ");
+  Serial.print(city.Name);
+  Serial.print(" at ");
+  Serial.println(city.ApiID);
+
   if (!success)
-    return success;
+    return false;
+
+  Serial.println("Extracting current weather");
+  city.ActualWeather.setWeather(doc["state"].as<char *>());
+  city.ActualWeather.setTemperature(doc["attributes"]["temperature"].as<double>());
+  city.ActualWeather.setWindSpeed(doc["attributes"]["wind_speed"].as<double>());
+  //dtostrf(doc["attributes"]["forecast"][0]["precipitation"].as<double>(), 4, 1, expectedRain);
+  //iconAbbr(currentWeatherIcon, doc["state"].as<char *>());
 
   // Extracting Info from JSON
-  dtostrf(doc["attributes"]["forecast"][indForecast]["temperature"].as<double>(), 4, 1, forecastTemperatureMax);
-  dtostrf(doc["attributes"]["forecast"][indForecast]["templow"].as<double>(), 4, 1, forecastTemperatureMin);
-  iconAbbr(forecastIcon, doc["state"].as<char *>());
+  for (size_t indForecast = 0; indForecast < 4; indForecast++)
+  {
+    // Serial.print("Extracting forecast #");
+    // Serial.println(indForecast);
+
+    city.Forecasts[indForecast].setWeather(doc["attributes"]["forecast"][indForecast]["condition"].as<char *>());
+    //city.Forecasts[indForecast].setDay(doc["attributes"]["forecast"][indForecast]["condition"].as<char *>());
+    city.Forecasts[indForecast].setDayFromDate(doc["attributes"]["forecast"][indForecast]["datetime"].as<char *>());
+    city.Forecasts[indForecast].setTemperatureMax(doc["attributes"]["forecast"][indForecast]["temperature"].as<float>());
+    city.Forecasts[indForecast].setTemperatureMin(doc["attributes"]["forecast"][indForecast]["templow"].as<float>());
+    city.Forecasts[indForecast].setRainHeight(doc["attributes"]["forecast"][indForecast]["precipitation"].as<float>());
+    city.Forecasts[indForecast].setWindSpeed(doc["attributes"]["forecast"][indForecast]["wind_speed"].as<float>());
+  }
+  //dtostrf(doc["attributes"]["forecast"][indForecast]["temperature"].as<double>(), 4, 1, forecastTemperatureMax);
+
+  return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -464,7 +406,6 @@ void Network::setTime()
   Serial.print(asctime(&timeinfo));
 }
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -490,7 +431,6 @@ void Network::print_no_wifi()
   display.display();
   delay(5000);
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -534,5 +474,4 @@ void Network::iconAbbr(char *iconOutput, const char *weatherState)
   //      strcpy(iconOutput, "windy");
   //    if (strcmp(weatherState, "windy-variant") == 0)
   //      strcpy(iconOutput, "windy-variant");
-
 }

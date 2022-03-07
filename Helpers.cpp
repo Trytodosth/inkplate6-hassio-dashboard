@@ -10,7 +10,6 @@
 #include "Helpers.h"
 #include "Images.h"
 
-
 // Contants used for drawing icons
 char abbrs[15][24] = {"clear-night", "cloudy", "fog", "hail", "lightning", "lightning-rainy", "partlycloudy",
                       "pouring", "rainy", "snowy", "snowy-rainy", "sunny", "windy", "windy-variant", "exceptional"
@@ -180,4 +179,11 @@ void eraseAndPrint(char *text, int pos_x, int pos_y, const GFXfont *f, int textC
     eraseText(pos_x, pos_y, widthErase, heightErase, BLACK);
 
   printText(text, pos_x, pos_y, f);
+}
+
+
+
+void moveCursor(int deltaX, int deltaY)
+{
+  display.setCursor(display.getCursorX() + deltaX, display.getCursorY() + deltaY);
 }

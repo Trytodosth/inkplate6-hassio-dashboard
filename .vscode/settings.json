@@ -1,8 +1,7 @@
 {
-    "python.pythonPath": ".venv\\Scripts\\python.exe",
     "files.associations": {
-        "random": "cpp",
-        "functional": "cpp",
-        "iosfwd": "cpp"
+        "array": "cpp",
+        "initializer_list": "cpp",
+        "utility": "cpp"
     }
 }
